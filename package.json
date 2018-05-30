@@ -1,0 +1,74 @@
+{
+  "name": "us-scheduler",
+  "version": "0.0.1",
+  "description": "Universal scheduler with observables",
+  "main": "dist/index",
+  "author": "ulfalfa",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "build": "trash dist && npm run build:main",
+    "build:main": "tsc -p src/tsconfig.main.json",
+    "build:tests": "tsc -p src/tsconfig.spec.json",
+    "lint": "tslint --project tsconfig.json --fix",
+    "unit": "nyc ava-ts src/**/*.spec.ts",
+    "watch": "ava-ts -w -v src/**/*.spec.ts",
+    "check-coverage": "nyc check-coverage",
+    "html-coverage": "nyc report --reporter=html",
+    "test": "yarn lint && yarn unit && yarn check-coverage",
+    "cov": "yarn unit && yarn html-coverage && opn build/coverage/index.html",
+    "docs": "yarn docs:html && opn build/docs/index.html",
+    "docs:html": "typedoc src/index.ts --excludePrivate --mode file --theme minimal --out build/docs",
+    "docs:publish": "yarn docs:html && gh-pages -d build/docs",
+    "changelog": "standard-version",
+    "release": "yarn reset && yarn test && yarn docs:publish && yarn changelog",
+    "reset": "git clean -dfx && git reset --hard && yarn"
+  },
+  "nyc": {
+    "exclude": [
+      "**/*.js",
+      "**/*.d.ts",
+      "**/*.spec.ts"
+    ],
+    "extension": [
+      ".ts"
+    ],
+    "reporter": [
+      "html",
+      "text"
+    ],
+    "cache":true,
+    "sourceMap": true,
+    "instrument": true,
+    "all": false,
+    "report-dir": "./build/coverage"
+},
+  "devDependencies": {
+    "@types/jest": "^22.2.3",
+    "@types/luxon": "^0.5.2",
+    "@types/node": "^10.1.3",
+    "ava": "^0.25.0",
+    "ava-ts": "^0.24.5",
+    "concurrently": "^3.5.1",
+    "cz-conventional-changelog": "^2.1.0",
+    "node-ts": "^2.1.2",
+    "nyc": "^11.8.0",
+    "opn-cli": "^3.1.0",
+    "standard-version": "^4.4.0",
+    "trash-cli": "^1.4.0",
+    "ts-node": "^6.0.5",
+    "typedoc": "^0.11.1",
+    "typescript": "^2.8.3"
+  },
+  "dependencies": {
+    "cron-parser": "^2.5.0",
+    "luxon": "^1.2.1",
+    "rxjs": "^6.2.0",
+    "suncalc": "^1.8.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}

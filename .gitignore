@@ -1,0 +1,6 @@
+node_modules
+dist
+build
+yarn.error
+.nyc_output
+yarn-error.log
