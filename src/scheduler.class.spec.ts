@@ -1,20 +1,12 @@
 import { test } from 'ava';
-import {
-  UsScheduler,
-  ILabeledDate
-} from './scheduler.class';
+import { UsScheduler, ILabeledDate } from './scheduler.class';
 import { from, Observable } from 'rxjs';
-import {
-  toArray,
-  tap,
-  take,
-  map
-} from 'rxjs/operators';
+import { toArray, tap, take, map } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
 import { DateTime } from 'luxon';
 
 function formatLabeledDate(_t: ILabeledDate) {
-  return `${_t.label}->${_t.date.toISO()}`
+  return `${_t.label}->${_t.date.toISO()}`;
 }
 
 const ld2string: (any) => Observable<string> = map(formatLabeledDate);
@@ -94,7 +86,8 @@ test('Can calculate suntimes', t => {
         'sunset->2018-06-28T21:54:33.793+02:00',
         '22:30->2018-06-28T22:30:00.000+02:00',
         'dusk->2018-06-28T22:47:18.295+02:00',
-        'nauticalDusk->2018-06-29T00:22:12.072+02:00' ]);
+        'nauticalDusk->2018-06-29T00:22:12.072+02:00'
+      ]);
     })
   );
 });
@@ -110,8 +103,10 @@ test('Can calculate suntimes with filter', t => {
     ld2string,
     toArray(),
     tap((_ts: string[]) => {
-      t.deepEqual(_ts, [ 'sunset->2018-06-28T21:54:33.793+02:00',
-  '22:30->2018-06-28T22:30:00.000+02:00' ]);
+      t.deepEqual(_ts, [
+        'sunset->2018-06-28T21:54:33.793+02:00',
+        '22:30->2018-06-28T22:30:00.000+02:00'
+      ]);
     })
   );
 });
@@ -123,37 +118,38 @@ test('Can calculate suntimes with date and filter', t => {
     now: '2018-06-28T13:00:00.000+0200',
     customTimes: '22:30,6:30(wakeup), 12:00,25:00,2:99'
   });
-  return from(uss
-    .generateSunTimes(DateTime.fromISO('2018-06-27T11:00:00.000+0200'), 'nauticalDusk'))
-    .pipe(
+  return from(
+    uss.generateSunTimes(
+      DateTime.fromISO('2018-06-27T11:00:00.000+0200'),
+      'nauticalDusk'
+    )
+  ).pipe(
     ld2string,
-        toArray(),
+    toArray(),
     tap((s: string[]) => {
-      t.deepEqual(s, [
-  'nauticalDusk->2018-06-28T00:23:08.692+02:00' ]);
+      t.deepEqual(s, ['nauticalDusk->2018-06-28T00:23:08.692+02:00']);
     })
   );
 });
 
 test('Generates a cron starting from now', t => {
-
   const uss = new UsScheduler({
     latitude: 53.54,
     longitude: 9.98,
-    now: '2018-06-28T12:29:03.000+0200',
+    now: '2018-06-28T12:29:03.000+0200'
   });
   return from(uss.generateCron('0 30 12 * * *')).pipe(
     take(2),
     ld2string,
     toArray(),
     tap((data: string[]) => {
-      t.deepEqual(data,  ['___cron___->2018-06-28T12:30:00.000+02:00',
-  '___cron___->2018-06-29T12:30:00.000+02:00']);
+      t.deepEqual(data, [
+        '___cron___->2018-06-28T12:30:00.000+02:00',
+        '___cron___->2018-06-29T12:30:00.000+02:00'
+      ]);
     })
   );
 });
-
-
 
 test('generate croned sun times', t => {
   const uss = new UsScheduler({
@@ -167,26 +163,28 @@ test('generate croned sun times', t => {
     ld2string,
     toArray(),
     tap((result: string[]) => {
-      t.deepEqual(result, [ '12:32->2018-06-28T12:32:00.000+02:00',
-  'solarNoon->2018-06-28T13:24:28.750+02:00',
-  'goldenHour->2018-06-28T20:56:31.674+02:00',
-  'sunsetStart->2018-06-28T21:49:40.716+02:00',
-  'sunset->2018-06-28T21:54:33.793+02:00',
-  '22:30->2018-06-28T22:30:00.000+02:00',
-  'dusk->2018-06-28T22:47:18.295+02:00',
-  'nauticalDusk->2018-06-29T00:22:12.072+02:00',
-  'nauticalDusk->2018-06-29T00:22:12.072+02:00',
-  'wakeup->2018-06-29T06:30:00.000+02:00',
-  '12:32->2018-06-29T12:32:00.000+02:00',
-  '22:30->2018-06-29T22:30:00.000+02:00',
-  'nauticalDusk->2018-06-30T00:21:05.979+02:00',
-  'wakeup->2018-06-30T06:30:00.000+02:00',
-  '12:32->2018-06-30T12:32:00.000+02:00',
-  '22:30->2018-06-30T22:30:00.000+02:00',
-  'nauticalDusk->2018-07-01T00:19:50.993+02:00',
-  'wakeup->2018-07-01T06:30:00.000+02:00',
-  '12:32->2018-07-01T12:32:00.000+02:00',
-  '22:30->2018-07-01T22:30:00.000+02:00' ]);
+      t.deepEqual(result, [
+        '12:32->2018-06-28T12:32:00.000+02:00',
+        'solarNoon->2018-06-28T13:24:28.750+02:00',
+        'goldenHour->2018-06-28T20:56:31.674+02:00',
+        'sunsetStart->2018-06-28T21:49:40.716+02:00',
+        'sunset->2018-06-28T21:54:33.793+02:00',
+        '22:30->2018-06-28T22:30:00.000+02:00',
+        'dusk->2018-06-28T22:47:18.295+02:00',
+        'nauticalDusk->2018-06-29T00:22:12.072+02:00',
+        'nauticalDusk->2018-06-29T00:22:12.072+02:00',
+        'wakeup->2018-06-29T06:30:00.000+02:00',
+        '12:32->2018-06-29T12:32:00.000+02:00',
+        '22:30->2018-06-29T22:30:00.000+02:00',
+        'nauticalDusk->2018-06-30T00:21:05.979+02:00',
+        'wakeup->2018-06-30T06:30:00.000+02:00',
+        '12:32->2018-06-30T12:32:00.000+02:00',
+        '22:30->2018-06-30T22:30:00.000+02:00',
+        'nauticalDusk->2018-07-01T00:19:50.993+02:00',
+        'wakeup->2018-07-01T06:30:00.000+02:00',
+        '12:32->2018-07-01T12:32:00.000+02:00',
+        '22:30->2018-07-01T22:30:00.000+02:00'
+      ]);
     })
   );
 });
@@ -275,6 +273,98 @@ test('Observe Cron', t => {
       a: '___cron___:1000:2018-05-28T12:00:01.000+02:00',
       b: '___cron___:1000:2018-05-28T12:00:02.000+02:00',
       c: '___cron___:1000:2018-05-28T12:00:03.000+02:00'
+    });
+  });
+});
+
+test('Schedule a cron', t => {
+  const uss = new UsScheduler({
+    latitude: 53.54,
+    longitude: 9.98,
+    customTimes: '12:01(start),12:02(second)',
+    now: '2018-05-28T12:00:00.000+02:00'
+  });
+
+  let testScheduler = new TestScheduler((actual, expected) => {
+    t.deepEqual(actual, expected);
+  });
+
+  // This test will actually run *synchronously*
+  testScheduler.run(({ cold, expectObservable }) => {
+    const output = uss.schedule('0 * * * * *').pipe(
+      map((date: ILabeledDate) => {
+        return `${date.label}:${date.waitMS}:${date.date.toISO()}`;
+      }),
+      take(3)
+    );
+    expectObservable(output).toBe('1m a 59.999s b 59.999s (c|)', {
+      a: '___cron___:60000:2018-05-28T12:01:00.000+02:00',
+      b: '___cron___:60000:2018-05-28T12:02:00.000+02:00',
+      c: '___cron___:60000:2018-05-28T12:03:00.000+02:00'
+    });
+  });
+  // This test will actually run *synchronously*
+  //
+  //
+  testScheduler = new TestScheduler((actual, expected) => {
+    t.deepEqual(actual, expected);
+  });
+  testScheduler.run(({ cold, expectObservable }) => {
+    const output = uss.schedule().pipe(
+      map((date: ILabeledDate) => {
+        return `${date.label}:${date.waitMS}:${date.date.toISO()}`;
+      }),
+      take(3)
+    );
+    expectObservable(output).toBe('1s a 0.999s b 0.999s (c|)', {
+      a: '___cron___:1000:2018-05-28T12:00:01.000+02:00',
+      b: '___cron___:1000:2018-05-28T12:00:02.000+02:00',
+      c: '___cron___:1000:2018-05-28T12:00:03.000+02:00'
+    });
+  });
+});
+
+test('Schedule a filtered', t => {
+  const uss = new UsScheduler({
+    latitude: 53.54,
+    longitude: 9.98,
+    customTimes: '12:01(start),12:02(second)',
+    now: '2018-05-28T12:00:00.000+02:00'
+  });
+
+  let testScheduler = new TestScheduler((actual, expected) => {
+    t.deepEqual(actual, expected);
+  });
+
+  // This test will actually run *synchronously*
+  testScheduler.run(({ cold, expectObservable }) => {
+    const output = uss.schedule('start', 'second', 'sunset', '0-7').pipe(
+      map((date: ILabeledDate) => {
+        return `${date.label}:${date.waitMS}:${date.date.toISO()}`;
+      }),
+      take(3)
+    );
+    expectObservable(output).toBe('1m a 59.999s b 34345855ms (c|)', {
+      a: 'start:60000:2018-05-28T12:01:00.000+02:00',
+      b: 'second:60000:2018-05-28T12:02:00.000+02:00',
+      c: 'sunset:34345856:2018-05-28T21:34:25.856+02:00'
+    });
+  });
+  // This test will actually run *synchronously*
+  testScheduler = new TestScheduler((actual, expected) => {
+    t.deepEqual(actual, expected);
+  });
+  testScheduler.run(({ cold, expectObservable }) => {
+    const output = uss.schedule('start', 'second', 'sunset').pipe(
+      map((date: ILabeledDate) => {
+        return `${date.label}:${date.waitMS}:${date.date.toISO()}`;
+      }),
+      take(3)
+    );
+    expectObservable(output).toBe('1m a 59.999s b 34345855ms (c|)', {
+      a: 'start:60000:2018-05-28T12:01:00.000+02:00',
+      b: 'second:60000:2018-05-28T12:02:00.000+02:00',
+      c: 'sunset:34345856:2018-05-28T21:34:25.856+02:00'
     });
   });
 });

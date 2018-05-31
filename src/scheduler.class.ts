@@ -15,8 +15,8 @@ export interface ISchedulerOptions {
   /** longitude for sun calculations */
   longitude: number;
   /** optional custom times for scheduler
-  *   HH:mm separated by comma
-  */
+   *   HH:mm separated by comma
+   */
   customTimes?: string;
   /** optional startTime used a now in ISO Format(mainly for testing purposes) */
   now?: string;
@@ -53,12 +53,11 @@ export interface ILabeledDate {
   waitMS?: number;
 }
 
-
 const CRON_LABEL = '___cron___';
 const START_LABEL = '___start___';
 
 const TIMES_MATCHER = /(?:(\b1?[0-9]|\b2[0-3]):([0-5][0-9]))(?:\((.+?)\))?/g;
-
+export const LABEL_PATTERN = /^[a-zA-Z0-9\:_]*$/;
 /**
  * the main class for doing all the scheduling
  */
@@ -188,12 +187,12 @@ export class UsScheduler {
     }
     const cronPattern = '0 0 * * ' + dayPattern;
 
-    yield * this.generateSunTimes(this.now, ...labelFilter);
+    yield* this.generateSunTimes(this.now, ...labelFilter);
 
     const cron = this.generateCron(cronPattern);
     while (true) {
       const date = cron.next().value;
-      yield * this.generateSunTimes(date.date, ...labelFilter);
+      yield* this.generateSunTimes(date.date, ...labelFilter);
     }
   }
 
@@ -204,10 +203,9 @@ export class UsScheduler {
    * @return            time observable (endless)
    */
   public observeSunTimes(
-    dayPattern ?: string,
+    dayPattern?: string,
     ...labels: string[]
-  ): Observable < ILabeledDate > {
-
+  ): Observable<ILabeledDate> {
     const times = this.generateCronedSunTimes(dayPattern, ...labels);
 
     return of({ label: START_LABEL, date: this.now }).pipe(
@@ -232,8 +230,7 @@ export class UsScheduler {
    * {@link https://github.com/harrisiirak/cron-parser | cron-parser}
    * @return             observable stream
    */
-  public observeCron(cronPattern: string) {
-
+  public observeCron(cronPattern: string): Observable<ILabeledDate> {
     const cron = this.generateCron(cronPattern);
 
     return of({ label: START_LABEL, date: this.now }).pipe(
@@ -250,6 +247,27 @@ export class UsScheduler {
       }),
       filter((date: ILabeledDate) => date.label !== START_LABEL)
     );
-
+  }
+  /**
+   * schedule either a cron pattern or suntimes
+   * @param  pattern either a cron pattern or the first filter for the suntimes
+   * @param  ...pars more filters. the last one can be a weekday cron filter
+   * @return         a timed observable of labeled dates
+   */
+  public schedule(
+    pattern: string = '* * * * * *',
+    ...pars: string[]
+  ): Observable<ILabeledDate> {
+    if (pattern.match(LABEL_PATTERN)) {
+      pars.splice(0, 0, pattern);
+      if (pars[pars.length - 1].match(LABEL_PATTERN)) {
+        const [dayPattern] = pars.splice(-1, 1);
+        return this.observeSunTimes(dayPattern, ...pars);
+      } else {
+        return this.observeSunTimes(...pars);
+      }
+    } else {
+      return this.observeCron(pattern);
+    }
   }
 }
