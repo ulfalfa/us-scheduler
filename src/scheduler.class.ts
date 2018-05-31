@@ -278,7 +278,6 @@ export class UsScheduler {
   public in(duration: string|number): Observable<ILabeledDate> {
     let d: Duration;
     if (typeof duration === 'string') {
-      const iso = 'P' + duration.toUpperCase();
       d = Duration.fromISO('PT' + duration.toUpperCase());
     } else {
       d = Duration.fromISO('PT' + duration.toString() + 'S');
