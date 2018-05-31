@@ -1,71 +1,99 @@
 import * as Suncalc from 'suncalc';
 import * as cronParser from 'cron-parser';
 
-import { DateTime, Settings } from 'luxon';
+import { DateTime } from 'luxon';
 
-import { Observable, Observer, from, of } from 'rxjs';
-import {
-  map,
-  mergeMap,
-  concatMap,
-  filter,
-  delay,
-  switchAll, tap, startWith, pairwise
-} from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { map, concatMap, filter, delay, expand } from 'rxjs/operators';
+
+/**
+ * Options for creating an object UsScheduler
+ */
 export interface ISchedulerOptions {
   /** latitude for sun calculations */
   latitude: number;
   /** longitude for sun calculations */
   longitude: number;
-  /** optional startTime in ISO Format(mainly for testing purposes) */
-  startAt?: string;
   /** optional custom times for scheduler
-  HH:mm separated by comma
+  *   HH:mm separated by comma
   */
   customTimes?: string;
+  /** optional startTime used a now in ISO Format(mainly for testing purposes) */
+  now?: string;
 }
-
+/**
+ * Interface for all returned date items (e.g. label = 'sunset')
+ */
 export interface ICustomTime {
+  /**
+   * label of the time (e.g. wakeup or gobed)
+   * if not given the time will be the label
+   */
   label?: string;
+  /**
+   * time as string (format HH:mm)
+   */
   time: string;
 }
 
 /**
- * a key value pair of times
+ * a key value pair of label and datetime
  */
 export interface ILabeledDate {
   /** the name of the time (eg. noon, sunset or custom names) */
   label: string;
-  /** the date of the specific point of day */
+  /** the date of the specific point of day
+   *(s.{@link https://moment.github.io/luxon/docs/class/src/datetime.js~DateTime.html | luxon})
+   **/
   date: DateTime;
+  /**
+   * only used internally for scheduling (how long to wait)
+   *
+   */
+  waitMS?: number;
 }
 
+/**
+the label all cron objects are send
+ */
 export const CRON_LABEL = '_cron_';
-export const CUSTOM_LABEL = '_custom_';
-const TIMES_SEPARATOR = ',';
+
+
 const TIMES_MATCHER = /(?:(\b1?[0-9]|\b2[0-3]):([0-5][0-9]))(?:\((.+?)\))?/g;
 
 /**
  * the main class for doing all the scheduling
  */
 export class UsScheduler {
+  protected _now: DateTime = null;
+
   constructor(protected opts: ISchedulerOptions) {
-    Settings.defaultZoneName = 'Europe/Berlin';
+    if (this.opts.now) {
+      this._now = DateTime.fromISO(this.opts.now);
+    }
+  }
+  /**
+   * gets the current time (could be overriden by options)
+   * @return the current time
+   */
+  public get now(): DateTime {
+    return this._now ? this._now : DateTime.local();
   }
 
-  public get startAt(): DateTime {
-    return this.opts.startAt ? DateTime.fromISO(this.opts.startAt) : DateTime.local();
-  }
-
-  public getCustomTimes(aDate?: string): any[] {
+  /**
+   * converts the times given in constructor options and converts them
+   * to labeled dates for a given day
+   * @param  forDay the day the times should be generated for
+   * @return        array of labeled dates
+   */
+  public getCustomTimes(forDay: DateTime = this.now): ILabeledDate[] {
     const times = this.opts.customTimes || '';
-    const start: DateTime = aDate ? DateTime.fromISO(aDate) : this.startAt;
 
     let matches: any[];
     const result = [];
     while ((matches = TIMES_MATCHER.exec(times))) {
       const [timeStr, hour, min, label] = matches;
-      const newDate = start
+      const newDate = forDay
         .set({ hour: parseInt(hour, 0), minute: parseInt(min, 0) })
         .startOf('minute');
 
@@ -77,85 +105,126 @@ export class UsScheduler {
 
     return result;
   }
+  /**
+   * calculates the sun times for the location and adds
+   * the custom times.
+   * @param  forDay          the day for which the times should be calculated
+   * @param  ...labelFilter filter for labels (e.g. only get sunsets and sunrise)
+   * @return                Iterator for the sorted times
+   */
+  public *generateSunTimes(
+    start?: DateTime | string,
+    ...labelFilter: string[]
+  ): IterableIterator<ILabeledDate> {
+    let startTime: DateTime;
+
+    if (typeof start === 'string') {
+      labelFilter.push(start);
+      startTime = this.now;
+    } else {
+      startTime = start || this.now;
+    }
+    const sctimes = Suncalc.getTimes(
+      startTime.toJSDate(),
+      this.opts.latitude,
+      this.opts.longitude
+    );
+    const allTimes = Object.keys(sctimes)
+      .map((key: string) => ({
+        label: key,
+        date: DateTime.fromJSDate(sctimes[key])
+      }))
+      .filter((date: ILabeledDate) => date.date.isValid)
+
+      .concat(this.getCustomTimes(startTime))
+      .filter(
+        (date: ILabeledDate) =>
+          labelFilter.length === 0 || labelFilter.indexOf(date.label) > -1
+      )
+      .filter(
+        (date: ILabeledDate) => date.date.diff(startTime).milliseconds >= 0
+      )
+      .sort(
+        (_t1: ILabeledDate, _t2: ILabeledDate) =>
+          _t1.date.diff(_t2.date).milliseconds
+      );
+    for (let i = 0; i < allTimes.length; i++) {
+      yield allTimes[i];
+    }
+  }
 
   /**
-   * get the sun times of a specific day
-   * @param  aDate the day, for which the sun times are needed (ISO String)
-   * @return       observable of calculated sun times for the day
+   * return a cron iterator for a given cron pattern
+   * @param  cronPattern cronpattern (s. wiki)
+   * @return             an iterator of labeled dates
    */
-  public getSunTimes(startAt?: string): Observable<ILabeledDate> {
-    const start = startAt ? DateTime.fromISO(startAt) : this.startAt;
-    return Observable.create((obs: Observer<ILabeledDate>) => {
-      const sctimes = Suncalc.getTimes(
-        start.toJSDate(),
-        this.opts.latitude,
-        this.opts.longitude
-      );
-      Object.keys(sctimes)
-        .map((key: string) => ({
-          label: key,
-          date: DateTime.fromJSDate(sctimes[key])
-        }))
-        .concat(this.getCustomTimes(startAt))
-        .sort(
-          (_t1: ILabeledDate, _t2: ILabeledDate) =>
-            _t1.date.diff(_t2.date).milliseconds
-        )
-        .forEach((_t: ILabeledDate) => obs.next(_t));
-      obs.complete();
-      return () => {};
-    });
-  }
-
-  public observeSunTimes(dayPattern?: string): Observable<ILabeledDate> {
-    dayPattern = dayPattern || '*';
-    return this.observeCron('0 0 * * ' + dayPattern).pipe(
-      mergeMap((time: ILabeledDate) => this.getSunTimes(time.date.toISO()))
-    );
-  }
-
-  public observeCron(cronPattern: string): Observable<ILabeledDate> {
-
-    const options = {
-      iterator: true,
+  public *generateCron(cronPattern: string): IterableIterator<ILabeledDate> {
+    const times = cronParser.parseExpression(cronPattern, {
+      iterator: false,
       utc: false,
-      currentDate: this.startAt.startOf('day').toJSDate()
-    };
-
-    const times = cronParser.parseExpression(cronPattern, options);
-
-    // convert iterator to iterable
-    const iterable = {
-      [Symbol.iterator]() {
-        return {
-          next() {
-            return times.next();
-          }
-        };
-      }
-    };
-
-    return from(iterable).pipe(
-
-      map((date: any) => ({
+      currentDate: this.now.toJSDate()
+    });
+    while (true) {
+      yield {
         label: CRON_LABEL,
-        date: DateTime.fromJSDate(date.toDate())
-      }))
-    );
+        date: DateTime.fromJSDate(times.next().toDate())
+      };
+    }
   }
 
-  public schedule(dayPattern?: string) {
-    return this.observeSunTimes(dayPattern).pipe(
+  /**
+   * returns an iterator of suntimes repeating via a cron (only day based)
+   * @param  dayPattern     cron weekday (*= all days, 6,7= weekends...)
+   * @param  ...labelFilter filter for labels (only sunsets...)
+   * @return                iterator of labeled dates
+   */
+  public *generateCronedSunTimes(
+    dayPattern?: string,
+    ...labelFilter: string[]
+  ): IterableIterator<ILabeledDate> {
+    if (dayPattern && !dayPattern.match(/[,\d\*\-]+/)) {
+      labelFilter.push(dayPattern);
+      dayPattern = '*';
+    } else {
+      dayPattern = dayPattern || '*';
+    }
+    const cronPattern = '0 0 * * ' + dayPattern;
 
-      filter((_time: ILabeledDate) => (  !!['start', 'second'].find((val) => (val === _time.label)))),
-      startWith({label: '__start__', date: this.startAt}),
-      pairwise(),
-      concatMap(([now, t]: ILabeledDate[]) => {
-        console.log (now.label, t.label)
-        console.log ( now.date.toISO(), t.date.toISO(), t.date.diff(now.date).milliseconds);
-        console.log(`Waiting for ${t.label} on ${t.date.toISO()}`);
-        return of().pipe(delay(t.date.diff(now.date).milliseconds));
-      })
+    yield * this.generateSunTimes(this.now, ...labelFilter);
+
+    const cron = this.generateCron(cronPattern);
+    while (true) {
+      const date = cron.next().value;
+      yield * this.generateSunTimes(date.date, ...labelFilter);
+    }
+  }
+
+  /**
+   * the main scheduler for daytimes. every emit is scheduled
+   * @param  dayPattern a week day cron filter (e.g. only weekends)
+   * @param  ...labels  filter for wanted dates
+   * @return            time observable (endless)
+   */
+  public observeSunTimes(
+    dayPattern ?: string,
+    ...labels: string[]
+  ): Observable < ILabeledDate > {
+    const START_TAG = '___start___';
+    const times = this.generateCronedSunTimes(dayPattern, ...labels);
+
+    return of({ label: START_TAG, date: this.now }).pipe(
+      expand((time: ILabeledDate) => {
+        return of(times.next().value).pipe(
+          map((date: ILabeledDate) => {
+            date.waitMS = date.date.diff(time.date).milliseconds;
+            return date;
+          }),
+          concatMap((date: ILabeledDate) => {
+            return of(date).pipe(delay(date.waitMS));
+          })
+        );
+      }),
+      filter((date: ILabeledDate) => date.label !== START_TAG)
     );
   }
 }

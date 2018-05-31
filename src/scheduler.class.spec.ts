@@ -1,166 +1,249 @@
 import { test } from 'ava';
-import { UsScheduler, ISchedulerOptions, ILabeledDate, CRON_LABEL } from './scheduler.class';
-import { of } from 'rxjs';
-import { toArray, tap, take, skip, filter, map, delay } from 'rxjs/operators';
+import {
+  UsScheduler,
+  ILabeledDate
+} from './scheduler.class';
+import { from, Observable } from 'rxjs';
+import {
+  toArray,
+  tap,
+  take,
+  map
+} from 'rxjs/operators';
+import { TestScheduler } from 'rxjs/testing';
 import { DateTime } from 'luxon';
 
-const options: ISchedulerOptions = {
-  latitude: 53.54,
-  longitude: 9.98,
-  startAt: '2018-06-28T01:02:03.000+0200',
-  customTimes: '22:30,6:30(wakeup), 12:00,25:00,2:99'
-};
+function formatLabeledDate(_t: ILabeledDate) {
+  return `${_t.label}->${_t.date.toISO()}`
+}
 
-test.beforeEach('Initialize scheduler', (t) => {
-  t.context.uss = new UsScheduler(options);
-})
-test('Initializable', t => {
-  const uss1 = new UsScheduler({
+const ld2string: (any) => Observable<string> = map(formatLabeledDate);
+
+test.beforeEach('Initialize scheduler', t => {
+  t.context.uss = new UsScheduler({
     latitude: 53.54,
     longitude: 9.98,
+    now: '2018-06-28T01:02:03.000+0200',
+    customTimes: '22:30,6:30(wakeup), 12:00,25:00,2:99'
   });
-  t.is(typeof uss1, 'object');
-  t.log(`Starttime (current local time) ${uss1.startAt.toISO()}`);
-  t.is( uss1.startAt.diffNow().seconds, 0);
+});
 
-  const uss2 = new UsScheduler({
+test('Initializable and setting of now', t => {
+  let uss = new UsScheduler({
+    latitude: 53.54,
+    longitude: 9.98
+  });
+  t.is(typeof uss, 'object');
+  t.log(`Starttime (current local time) ${uss.now.toISO()}`);
+  t.is(
+    uss.now.toISO().substr(0, 16),
+    DateTime.local()
+      .toISO()
+      .substr(0, 16)
+  );
+
+  uss = new UsScheduler({
     latitude: 53.54,
     longitude: 9.98,
-    startAt: '2018-06-28T00:00:00.000+02:00'
+    now: '2018-06-28T00:00:00.000+02:00'
   });
-  t.is(typeof uss2, 'object');
-  t.log(`Starttime (given time): ${uss1.startAt.toISO()}`);
-  t.is (uss2.startAt.toISO(), '2018-06-28T00:00:00.000+02:00')
+  t.log(`Starttime (given time): ${uss.now.toISO()}`);
+  t.is(uss.now.toISO(), '2018-06-28T00:00:00.000+02:00');
 });
 
 test('parsing custom times', t => {
-  const dates = t.context.uss.getCustomTimes('2018-12-28T01:02:03.000+0100')
+  const dates = t.context.uss.getCustomTimes(
+    DateTime.fromISO('2018-12-28T12:00:00.000+0100')
+  );
   t.deepEqual(dates, [
     { label: '22:30', date: DateTime.fromISO('2018-12-28T22:30:00.000+01:00') },
-    { label: 'wakeup', date: DateTime.fromISO('2018-12-28T06:30:00.000+01:00') },
-    { label: '12:00', date: DateTime.fromISO('2018-12-28T12:00:00.000+01:00') },
+    {
+      label: 'wakeup',
+      date: DateTime.fromISO('2018-12-28T06:30:00.000+01:00')
+    },
+    { label: '12:00', date: DateTime.fromISO('2018-12-28T12:00:00.000+01:00') }
   ]);
-
-})
+});
 test('parsing empty custom times', t => {
   const uss = new UsScheduler({
     latitude: 53.54,
     longitude: 9.98
   });
-  const dates = uss.getCustomTimes('2018-12-28T01:02:03.000+0100');
+  const dates = uss.getCustomTimes();
+
   t.deepEqual(dates, []);
-})
-
-test('parsing custom times without startdate', t => {
-  const dates = t.context.uss.getCustomTimes()
-  t.deepEqual(dates, [
-    { label: '22:30', date: DateTime.fromISO('2018-06-28T22:30:00.000+02:00') },
-    { label: 'wakeup', date: DateTime.fromISO('2018-06-28T06:30:00.000+02:00') },
-    { label: '12:00', date: DateTime.fromISO('2018-06-28T12:00:00.000+02:00') },
-  ]);
-
-})
-
-
-test('Can calculate sun time', t => {
-  return t.context.uss.getSunTimes('2018-11-28T23:59:59.00+0100').pipe(
-    toArray(),
-    tap((_sunTimes: ILabeledDate[]) => {
-      t.deepEqual(_sunTimes, [
-        { label: 'nadir', date: DateTime.fromISO('2018-11-27T23:09:28.692Z') },
-        { label: 'nightEnd', date: DateTime.fromISO('2018-11-28T05:02:24.311Z') },
-        { label: 'wakeup', date: DateTime.fromISO('2018-11-28T05:30:00.000Z') },
-        { label: 'nauticalDawn', date: DateTime.fromISO('2018-11-28T05:44:23.245Z') },
-        { label: 'dawn', date: DateTime.fromISO('2018-11-28T06:28:36.257Z') },
-        { label: 'sunrise', date: DateTime.fromISO('2018-11-28T07:09:43.789Z') },
-        { label: 'sunriseEnd', date: DateTime.fromISO('2018-11-28T07:14:12.231Z') },
-        { label: 'goldenHourEnd', date: DateTime.fromISO('2018-11-28T08:12:22.271Z') },
-        { label: '12:00', date: DateTime.fromISO('2018-11-28T11:00:00.000Z') },
-        { label: 'solarNoon', date: DateTime.fromISO('2018-11-28T11:09:28.692Z') },
-        { label: 'goldenHour', date: DateTime.fromISO('2018-11-28T14:06:35.112Z') },
-        { label: 'sunsetStart', date: DateTime.fromISO('2018-11-28T15:04:45.153Z') },
-        { label: 'sunset', date: DateTime.fromISO('2018-11-28T15:09:13.594Z') },
-        { label: 'dusk', date: DateTime.fromISO('2018-11-28T15:50:21.127Z') },
-        { label: 'nauticalDusk', date: DateTime.fromISO('2018-11-28T16:34:34.139Z') },
-        { label: 'night', date: DateTime.fromISO('2018-11-28T17:16:33.073Z') },
-        { label: '22:30', date: DateTime.fromISO('2018-11-28T21:30:00.000Z') },
-      ]);
-    })
-  );
-});
-test('Can calculate sun time w/o date', t => {
-  return t.context.uss.getSunTimes().pipe(
-    take(1),
-    tap((_sunTimes: ILabeledDate) => {
-      t.is(_sunTimes.date.toISO(), '2018-06-27T01:24:17.146+02:00');
-    })
-  );
 });
 
-test('Can do cron parsing with optional starttime', t => {
-  return t.context.uss.observeCron('0 30 12 * * *')
-    .pipe(
-      filter((data: ILabeledDate) => (data.label === CRON_LABEL)),
-      map((data: ILabeledDate) => (data.date.toISO())),
-      take(5),
-      toArray(),
-      tap((data: string[]) => {
-        t.deepEqual (data, [
-          '2018-06-28T12:30:00.000+02:00',
-          '2018-06-29T12:30:00.000+02:00',
-          '2018-06-30T12:30:00.000+02:00',
-          '2018-07-01T12:30:00.000+02:00',
-          '2018-07-02T12:30:00.000+02:00',
-        ]);
-      }),
-
-    )
-
-
-});
-test('Can do cron parsing w/o optional starttime', t => {
-  const now = new Date();
-  const uss1 = new UsScheduler({
+test('Can calculate suntimes', t => {
+  const uss = new UsScheduler({
     latitude: 53.54,
     longitude: 9.98,
+    now: '2018-06-28T11:00:00.000+0200',
+    customTimes: '22:30,6:30(wakeup), 12:00,25:00,2:99'
   });
-  return uss1.observeCron('0 * * * * *')
-    .pipe(
-      tap((data: ILabeledDate) => {
-        const delta =  Math.round((data.date.valueOf() - now.valueOf()) / 1000);
-        t.true( delta < 70, 'max 70 seconds passed');
-      }),
-      take(1)
 
-    )
-});
-
-
-test('Observing croned sun times', t => {
-  return t.context.uss.observeSunTimes().pipe(
-
-    skip(100),
-    take (1),
-    tap((date: ILabeledDate) => {
-      t.is(date.date.toISO(), '2018-07-04T12:00:00.000+02:00');
-      t.is(date.label, '12:00');
+  return from(uss.generateSunTimes()).pipe(
+    ld2string,
+    toArray(),
+    tap((_ts: string[]) => {
+      t.deepEqual(_ts, [
+        '12:00->2018-06-28T12:00:00.000+02:00',
+        'solarNoon->2018-06-28T13:24:28.750+02:00',
+        'goldenHour->2018-06-28T20:56:31.674+02:00',
+        'sunsetStart->2018-06-28T21:49:40.716+02:00',
+        'sunset->2018-06-28T21:54:33.793+02:00',
+        '22:30->2018-06-28T22:30:00.000+02:00',
+        'dusk->2018-06-28T22:47:18.295+02:00',
+        'nauticalDusk->2018-06-29T00:22:12.072+02:00' ]);
     })
-  )
+  );
+});
+test('Can calculate suntimes with filter', t => {
+  const uss = new UsScheduler({
+    latitude: 53.54,
+    longitude: 9.98,
+    now: '2018-06-28T11:00:00.000+0200',
+    customTimes: '22:30,6:30(wakeup), 12:00,25:00,2:99'
+  });
+
+  return from(uss.generateSunTimes('wakeup', '22:30', 'sunset')).pipe(
+    ld2string,
+    toArray(),
+    tap((_ts: string[]) => {
+      t.deepEqual(_ts, [ 'sunset->2018-06-28T21:54:33.793+02:00',
+  '22:30->2018-06-28T22:30:00.000+02:00' ]);
+    })
+  );
 });
 
+test('Can calculate suntimes with date and filter', t => {
+  const uss = new UsScheduler({
+    latitude: 53.54,
+    longitude: 9.98,
+    now: '2018-06-28T13:00:00.000+0200',
+    customTimes: '22:30,6:30(wakeup), 12:00,25:00,2:99'
+  });
+  return from(uss
+    .generateSunTimes(DateTime.fromISO('2018-06-27T11:00:00.000+0200'), 'nauticalDusk'))
+    .pipe(
+    ld2string,
+        toArray(),
+    tap((s: string[]) => {
+      t.deepEqual(s, [
+  'nauticalDusk->2018-06-28T00:23:08.692+02:00' ]);
+    })
+  );
+});
 
-test.skip('Scheduling', t => {
-  const now = new Date();
+test('Generates a cron starting from now', t => {
 
   const uss = new UsScheduler({
     latitude: 53.54,
     longitude: 9.98,
-    customTimes: '12:01(start),12:02(second)',
-    startAt: '2018-05-28T12:00:00.000+02:00'
+    now: '2018-06-28T12:29:03.000+0200',
   });
-  t.log ('Now', now.toISOString(), now.toLocaleTimeString())
+  return from(uss.generateCron('0 30 12 * * *')).pipe(
+    take(2),
+    ld2string,
+    toArray(),
+    tap((data: string[]) => {
+      t.deepEqual(data,  ['_cron_->2018-06-28T12:30:00.000+02:00',
+  '_cron_->2018-06-29T12:30:00.000+02:00']);
+    })
+  );
+});
 
-  /*return //uss.schedule().pipe(take(20),
-  tap((_t: any) => {
-    t.log('Ret', _t.label, _t.date.toISO())}));*/
-})
+
+
+test('generate croned sun times', t => {
+  const uss = new UsScheduler({
+    latitude: 53.54,
+    longitude: 9.98,
+    now: '2018-06-28T12:31:01.000+0200',
+    customTimes: '22:30,6:30(wakeup),12:32,25:00,2:99'
+  });
+  return from(uss.generateCronedSunTimes()).pipe(
+    take(20),
+    ld2string,
+    toArray(),
+    tap((result: string[]) => {
+      t.deepEqual(result, [ '12:32->2018-06-28T12:32:00.000+02:00',
+  'solarNoon->2018-06-28T13:24:28.750+02:00',
+  'goldenHour->2018-06-28T20:56:31.674+02:00',
+  'sunsetStart->2018-06-28T21:49:40.716+02:00',
+  'sunset->2018-06-28T21:54:33.793+02:00',
+  '22:30->2018-06-28T22:30:00.000+02:00',
+  'dusk->2018-06-28T22:47:18.295+02:00',
+  'nauticalDusk->2018-06-29T00:22:12.072+02:00',
+  'nauticalDusk->2018-06-29T00:22:12.072+02:00',
+  'wakeup->2018-06-29T06:30:00.000+02:00',
+  '12:32->2018-06-29T12:32:00.000+02:00',
+  '22:30->2018-06-29T22:30:00.000+02:00',
+  'nauticalDusk->2018-06-30T00:21:05.979+02:00',
+  'wakeup->2018-06-30T06:30:00.000+02:00',
+  '12:32->2018-06-30T12:32:00.000+02:00',
+  '22:30->2018-06-30T22:30:00.000+02:00',
+  'nauticalDusk->2018-07-01T00:19:50.993+02:00',
+  'wakeup->2018-07-01T06:30:00.000+02:00',
+  '12:32->2018-07-01T12:32:00.000+02:00',
+  '22:30->2018-07-01T22:30:00.000+02:00' ]);
+    })
+  );
+});
+
+test('Scheduling Deterministic', t => {
+  const uss = new UsScheduler({
+    latitude: 53.54,
+    longitude: 9.98,
+    customTimes: '12:01(start),12:02(second)',
+    now: '2018-05-28T12:00:00.000+02:00'
+  });
+
+  const testScheduler = new TestScheduler((actual, expected) => {
+    // some how assert the two objects are equal
+    // e.g. with chai `expect(actual).deep.equal(expected)`
+
+    t.deepEqual(actual, expected);
+  });
+
+  // This test will actually run *synchronously*
+  testScheduler.run(({ cold, expectObservable }) => {
+    const output = uss.observeSunTimes('start', 'second', 'sunset').pipe(
+      map((date: ILabeledDate) => {
+        return `${date.label}:${date.waitMS}:${date.date.toISO()}`;
+      }),
+      take(3)
+    );
+    expectObservable(output).toBe('60000ms a 59999ms b 34345855ms (c|)', {
+      a: 'start:60000:2018-05-28T12:01:00.000+02:00',
+      b: 'second:60000:2018-05-28T12:02:00.000+02:00',
+      c: 'sunset:34345856:2018-05-28T21:34:25.856+02:00'
+    });
+  });
+});
+
+test('Scheduling', t => {
+  const uss = new UsScheduler({
+    latitude: 53.54,
+    longitude: 9.98,
+    customTimes: '12:01(start),12:02(second)',
+    now: '2018-05-28T12:00:00.000+02:00'
+  });
+
+  const testScheduler = new TestScheduler((actual, expected) => {
+    // some how assert the two objects are equal
+    // e.g. with chai `expect(actual).deep.equal(expected)`
+    t.snapshot(actual);
+  });
+
+  // This test will actually run *synchronously*
+  testScheduler.run(({ cold, expectObservable }) => {
+    const output = uss.observeSunTimes().pipe(
+      map((date: ILabeledDate) => {
+        return `${date.label}:${date.waitMS}:${date.date.toISO()}`;
+      }),
+      take(10000)
+    );
+    expectObservable(output).toBe('');
+  });
+});

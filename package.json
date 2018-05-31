@@ -11,7 +11,7 @@
     "build:main": "tsc -p src/tsconfig.main.json",
     "build:tests": "tsc -p src/tsconfig.spec.json",
     "lint": "tslint --project tsconfig.json --fix",
-    "unit": "nyc ava-ts src/**/*.spec.ts",
+    "unit": "nyc ava-ts -v src/**/*.spec.ts",
     "watch": "ava-ts -w -v src/**/*.spec.ts",
     "check-coverage": "nyc check-coverage",
     "html-coverage": "nyc report --reporter=html",
@@ -24,6 +24,9 @@
     "release": "yarn reset && yarn test && yarn docs:publish && yarn changelog",
     "reset": "git clean -dfx && git reset --hard && yarn"
   },
+  "ava": {
+  "snapshotDir": "./build/snapshots"
+},
   "nyc": {
     "exclude": [
       "**/*.js",
@@ -41,7 +44,8 @@
     "sourceMap": true,
     "instrument": true,
     "all": false,
-    "report-dir": "./build/coverage"
+    "report-dir": "./build/coverage",
+    "temp-directory": "./build/nyc_output"
 },
   "devDependencies": {
     "@types/jest": "^22.2.3",
