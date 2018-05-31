@@ -1,9 +1,9 @@
 import * as Suncalc from 'suncalc';
 import * as cronParser from 'cron-parser';
 
-import { DateTime } from 'luxon';
+import { DateTime, Duration } from 'luxon';
 
-import { Observable, of } from 'rxjs';
+import { Observable, of, timer } from 'rxjs';
 import { map, concatMap, filter, delay, expand } from 'rxjs/operators';
 
 /**
@@ -269,5 +269,28 @@ export class UsScheduler {
     } else {
       return this.observeCron(pattern);
     }
+  }
+  /**
+   * emits after a specified duration
+   * @param  duration either a duration in ISO8601 (without the P) or seconds
+   * @return          observable, that fires after duration is over;
+   */
+  public in(duration: string|number): Observable<ILabeledDate> {
+    let d: Duration;
+    if (typeof duration === 'string') {
+      const iso = 'P' + duration.toUpperCase();
+      d = Duration.fromISO('PT' + duration.toUpperCase());
+    } else {
+      d = Duration.fromISO('PT' + duration.toString() + 'S');
+    }
+
+    const finish = this.now.plus(d);
+    return timer(d.as('milliseconds')).pipe(
+      map(() => ({
+        label: '___timer___',
+        date: finish,
+        waitMS: d.as('milliseconds')
+      })
+    ));
   }
 }

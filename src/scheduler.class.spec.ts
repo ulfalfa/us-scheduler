@@ -368,3 +368,52 @@ test('Schedule a filtered', t => {
     });
   });
 });
+
+test('Test "in" with ISO', t => {
+  const uss = new UsScheduler({
+    latitude: 53.54,
+    longitude: 9.98,
+    customTimes: '12:01(start),12:02(second)',
+    now: '2018-05-28T12:00:00.000+02:00'
+  });
+
+  const testScheduler = new TestScheduler((actual, expected) => {
+    t.deepEqual(actual, expected);
+  });
+
+  // This test will actually run *synchronously*
+  testScheduler.run(({ cold, expectObservable }) => {
+    const output = uss.in('1m').pipe(
+      map((date: ILabeledDate) => {
+        return `${date.label}:${date.waitMS}:${date.date.toISO()}`;
+      })
+    );
+    expectObservable(output).toBe('1m (a|)', {
+      a: '___timer___:60000:2018-05-28T12:01:00.000+02:00'
+    });
+  });
+});
+
+test('Test "in" with seconds', t => {
+  const uss = new UsScheduler({
+    latitude: 53.54,
+    longitude: 9.98,
+    customTimes: '12:01(start),12:02(second)',
+    now: '2018-05-28T12:00:00.000+02:00'
+  });
+
+  const testScheduler = new TestScheduler((actual, expected) => {
+    t.deepEqual(actual, expected);
+  });
+
+  testScheduler.run(({ cold, expectObservable }) => {
+    const output = uss.in(30).pipe(
+      map((date: ILabeledDate) => {
+        return `${date.label}:${date.waitMS}:${date.date.toISO()}`;
+      })
+    );
+    expectObservable(output).toBe('0.5m (a|)', {
+      a: '___timer___:30000:2018-05-28T12:00:30.000+02:00'
+    });
+  });
+});
