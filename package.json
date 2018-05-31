@@ -17,9 +17,9 @@
     "html-coverage": "nyc report --reporter=html",
     "test": "yarn lint && yarn unit && yarn check-coverage",
     "cov": "yarn unit && yarn html-coverage && opn build/coverage/index.html",
-    "docs": "yarn docs:html && opn build/docs/index.html",
-    "docs:html": "typedoc src/index.ts --excludePrivate --mode file --theme minimal --out build/docs",
-    "docs:publish": "yarn docs:html && gh-pages -d build/docs",
+    "docs": "yarn docs:html && opn docs/index.html",
+    "docs:html": "typedoc src/index.ts --excludePrivate --mode file --theme minimal --out docs",
+    "docs:publish": "yarn docs:html && gh-pages -d docs",
     "changelog": "standard-version",
     "release": "yarn reset && yarn test && yarn build && yarn docs:publish && yarn changelog",
     "reset": "git clean -dfx && git reset --hard && yarn"
