@@ -147,8 +147,8 @@ test('Generates a cron starting from now', t => {
     ld2string,
     toArray(),
     tap((data: string[]) => {
-      t.deepEqual(data,  ['_cron_->2018-06-28T12:30:00.000+02:00',
-  '_cron_->2018-06-29T12:30:00.000+02:00']);
+      t.deepEqual(data,  ['___cron___->2018-06-28T12:30:00.000+02:00',
+  '___cron___->2018-06-29T12:30:00.000+02:00']);
     })
   );
 });
@@ -245,5 +245,36 @@ test('Scheduling', t => {
       take(10000)
     );
     expectObservable(output).toBe('');
+  });
+});
+
+test('Observe Cron', t => {
+  const uss = new UsScheduler({
+    latitude: 53.54,
+    longitude: 9.98,
+    customTimes: '12:01(start),12:02(second)',
+    now: '2018-05-28T12:00:00.000+02:00'
+  });
+
+  const testScheduler = new TestScheduler((actual, expected) => {
+    // some how assert the two objects are equal
+    // e.g. with chai `expect(actual).deep.equal(expected)`
+
+    t.deepEqual(actual, expected);
+  });
+
+  // This test will actually run *synchronously*
+  testScheduler.run(({ cold, expectObservable }) => {
+    const output = uss.observeCron('* * * * * *').pipe(
+      map((date: ILabeledDate) => {
+        return `${date.label}:${date.waitMS}:${date.date.toISO()}`;
+      }),
+      take(3)
+    );
+    expectObservable(output).toBe('1s a 0.999s b 0.999s (c|)', {
+      a: '___cron___:1000:2018-05-28T12:00:01.000+02:00',
+      b: '___cron___:1000:2018-05-28T12:00:02.000+02:00',
+      c: '___cron___:1000:2018-05-28T12:00:03.000+02:00'
+    });
   });
 });

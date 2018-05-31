@@ -53,11 +53,9 @@ export interface ILabeledDate {
   waitMS?: number;
 }
 
-/**
-the label all cron objects are send
- */
-export const CRON_LABEL = '_cron_';
 
+const CRON_LABEL = '___cron___';
+const START_LABEL = '___start___';
 
 const TIMES_MATCHER = /(?:(\b1?[0-9]|\b2[0-3]):([0-5][0-9]))(?:\((.+?)\))?/g;
 
@@ -209,10 +207,10 @@ export class UsScheduler {
     dayPattern ?: string,
     ...labels: string[]
   ): Observable < ILabeledDate > {
-    const START_TAG = '___start___';
+
     const times = this.generateCronedSunTimes(dayPattern, ...labels);
 
-    return of({ label: START_TAG, date: this.now }).pipe(
+    return of({ label: START_LABEL, date: this.now }).pipe(
       expand((time: ILabeledDate) => {
         return of(times.next().value).pipe(
           map((date: ILabeledDate) => {
@@ -224,7 +222,34 @@ export class UsScheduler {
           })
         );
       }),
-      filter((date: ILabeledDate) => date.label !== START_TAG)
+      filter((date: ILabeledDate) => date.label !== START_LABEL)
     );
+  }
+
+  /**
+   * returns an observable cron stream
+   * @param  cronPattern a standard cron pattern
+   * {@link https://github.com/harrisiirak/cron-parser | cron-parser}
+   * @return             observable stream
+   */
+  public observeCron(cronPattern: string) {
+
+    const cron = this.generateCron(cronPattern);
+
+    return of({ label: START_LABEL, date: this.now }).pipe(
+      expand((time: ILabeledDate) => {
+        return of(cron.next().value).pipe(
+          map((date: ILabeledDate) => {
+            date.waitMS = date.date.diff(time.date).milliseconds;
+            return date;
+          }),
+          concatMap((date: ILabeledDate) => {
+            return of(date).pipe(delay(date.waitMS));
+          })
+        );
+      }),
+      filter((date: ILabeledDate) => date.label !== START_LABEL)
+    );
+
   }
 }
