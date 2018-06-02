@@ -24,16 +24,15 @@ export interface ISchedulerOptions {
 /**
  * Interface for all returned date items (e.g. label = 'sunset')
  */
-export interface ICustomTime {
+export interface ITime {
   /**
-   * label of the time (e.g. wakeup or gobed)
-   * if not given the time will be the label
+   * hour of day (24h format)
    */
-  label?: string;
+  hour: number;
   /**
-   * time as string (format HH:mm)
+   * minute of houer
    */
-  time: string;
+  minute: number;
 }
 
 /**
@@ -56,17 +55,24 @@ export interface ILabeledDate {
 const CRON_LABEL = '___cron___';
 const START_LABEL = '___start___';
 
-const TIMES_MATCHER = /(?:(\b1?[0-9]|\b2[0-3]):([0-5][0-9]))(?:\((.+?)\))?/g;
+// const TIMES_MATCHER = /(?:(\b1?[0-9]|\b2[0-3]):([0-5][0-9]))(?:\((.+?)\))?/g;
+const TIMES_MATCHER = /(?:(\b1?[0-9]|\b2[0-3]):([0-5][0-9]))(?:\((.+?)\))?/;
 export const LABEL_PATTERN = /^[a-zA-Z0-9\:_]*$/;
 /**
  * the main class for doing all the scheduling
  */
 export class UsScheduler {
   protected _now: DateTime = null;
+  protected _customTimes: {
+    [label: string]: ITime;
+  } = {};
 
-  constructor(protected opts: ISchedulerOptions) {
-    if (this.opts.now) {
-      this._now = DateTime.fromISO(this.opts.now);
+  constructor(protected _opts: ISchedulerOptions) {
+    if (this._opts.now) {
+      this._now = DateTime.fromISO(this._opts.now);
+    }
+    if (this._opts.customTimes) {
+      this.setCustomTimes(...this._opts.customTimes.split(','));
     }
   }
   /**
@@ -77,6 +83,19 @@ export class UsScheduler {
     return this._now ? this._now : DateTime.local();
   }
 
+  public setCustomTimes(...times: string[]) {
+    times.forEach((time: string) => {
+      const parsed = time.match(TIMES_MATCHER);
+      if (parsed) {
+        const [timeStr, hour, min, label] = parsed;
+        this._customTimes[label || timeStr] = {
+          hour: parseInt(hour, 0),
+          minute: parseInt(min, 0),
+        };
+      }
+    });
+  }
+
   /**
    * converts the times given in constructor options and converts them
    * to labeled dates for a given day
@@ -84,23 +103,14 @@ export class UsScheduler {
    * @return        array of labeled dates
    */
   public getCustomTimes(forDay: DateTime = this.now): ILabeledDate[] {
-    const times = this.opts.customTimes || '';
+    return Object.keys(this._customTimes).map((key) => {
+      const newDate = forDay.set(this._customTimes[key]).startOf('minute');
 
-    let matches: any[];
-    const result = [];
-    while ((matches = TIMES_MATCHER.exec(times))) {
-      const [timeStr, hour, min, label] = matches;
-      const newDate = forDay
-        .set({ hour: parseInt(hour, 0), minute: parseInt(min, 0) })
-        .startOf('minute');
-
-      result.push({
-        label: label || timeStr,
-        date: newDate
-      });
-    }
-
-    return result;
+      return {
+        label: key,
+        date: newDate,
+      };
+    });
   }
   /**
    * calculates the sun times for the location and adds
@@ -123,27 +133,27 @@ export class UsScheduler {
     }
     const sctimes = Suncalc.getTimes(
       startTime.toJSDate(),
-      this.opts.latitude,
-      this.opts.longitude
+      this._opts.latitude,
+      this._opts.longitude,
     );
     const allTimes = Object.keys(sctimes)
       .map((key: string) => ({
         label: key,
-        date: DateTime.fromJSDate(sctimes[key])
+        date: DateTime.fromJSDate(sctimes[key]),
       }))
       .filter((date: ILabeledDate) => date.date.isValid)
 
       .concat(this.getCustomTimes(startTime))
       .filter(
         (date: ILabeledDate) =>
-          labelFilter.length === 0 || labelFilter.indexOf(date.label) > -1
+          labelFilter.length === 0 || labelFilter.indexOf(date.label) > -1,
       )
       .filter(
-        (date: ILabeledDate) => date.date.diff(startTime).milliseconds >= 0
+        (date: ILabeledDate) => date.date.diff(startTime).milliseconds >= 0,
       )
       .sort(
         (_t1: ILabeledDate, _t2: ILabeledDate) =>
-          _t1.date.diff(_t2.date).milliseconds
+          _t1.date.diff(_t2.date).milliseconds,
       );
     for (let i = 0; i < allTimes.length; i++) {
       yield allTimes[i];
@@ -159,12 +169,12 @@ export class UsScheduler {
     const times = cronParser.parseExpression(cronPattern, {
       iterator: false,
       utc: false,
-      currentDate: this.now.toJSDate()
+      currentDate: this.now.toJSDate(),
     });
     while (true) {
       yield {
         label: CRON_LABEL,
-        date: DateTime.fromJSDate(times.next().toDate())
+        date: DateTime.fromJSDate(times.next().toDate()),
       };
     }
   }
@@ -217,10 +227,10 @@ export class UsScheduler {
           }),
           concatMap((date: ILabeledDate) => {
             return of(date).pipe(delay(date.waitMS));
-          })
+          }),
         );
       }),
-      filter((date: ILabeledDate) => date.label !== START_LABEL)
+      filter((date: ILabeledDate) => date.label !== START_LABEL),
     );
   }
 
@@ -242,10 +252,10 @@ export class UsScheduler {
           }),
           concatMap((date: ILabeledDate) => {
             return of(date).pipe(delay(date.waitMS));
-          })
+          }),
         );
       }),
-      filter((date: ILabeledDate) => date.label !== START_LABEL)
+      filter((date: ILabeledDate) => date.label !== START_LABEL),
     );
   }
   /**
@@ -275,7 +285,7 @@ export class UsScheduler {
    * @param  duration either a duration in ISO8601 (without the P) or seconds
    * @return          observable, that fires after duration is over;
    */
-  public in(duration: string|number): Observable<ILabeledDate> {
+  public in(duration: string | number): Observable<ILabeledDate> {
     let d: Duration;
     if (typeof duration === 'string') {
       d = Duration.fromISO('PT' + duration.toUpperCase());
@@ -288,8 +298,8 @@ export class UsScheduler {
       map(() => ({
         label: '___timer___',
         date: finish,
-        waitMS: d.as('milliseconds')
-      })
-    ));
+        waitMS: d.as('milliseconds'),
+      })),
+    );
   }
 }

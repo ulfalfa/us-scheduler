@@ -1,0 +1,177 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+@types/luxon	package.json	/^    "@types\/luxon": "^0.5.2",$/;"	f
+@types/node	package.json	/^    "@types\/node": "^10.1.3",$/;"	f
+all	package.json	/^    "all": false,$/;"	f
+allowJs	tsconfig.json	/^    "allowJs":false,$/;"	f
+arrow-return-shorthand	tslint.json	/^    "arrow-return-shorthand": true,$/;"	f
+author	package.json	/^  "author": "ulfalfa",$/;"	f
+ava	package.json	/^    "ava": "^0.25.0",$/;"	f
+ava	package.json	/^  "ava": {$/;"	f
+ava-ts	package.json	/^    "ava-ts": "^0.24.5",$/;"	f
+build	package.json	/^    "build": "trash dist && npm run build:main",$/;"	f
+build:main	package.json	/^    "build:main": "tsc -p src\/tsconfig.main.json",$/;"	f
+build:tests	package.json	/^    "build:tests": "tsc -p src\/tsconfig.spec.json",$/;"	f
+cache	package.json	/^    "cache": true,$/;"	f
+call-signature	tslint.json	/^        "call-signature": "nospace",$/;"	f
+callable-types	tslint.json	/^    "callable-types": true,$/;"	f
+changelog	package.json	/^    "changelog": "standard-version",$/;"	f
+check-coverage	package.json	/^    "check-coverage": "nyc check-coverage",$/;"	f
+class-name	tslint.json	/^    "class-name": true,$/;"	f
+comment-format	tslint.json	/^    "comment-format": [$/;"	f
+commitizen	package.json	/^    "commitizen": {$/;"	f
+compilerOptions	src/tsconfig.main.json	/^  "compilerOptions": {$/;"	f
+compilerOptions	src/tsconfig.spec.json	/^  "compilerOptions": {$/;"	f
+compilerOptions	tsconfig.json	/^  "compilerOptions": {$/;"	f
+config	package.json	/^  "config": {$/;"	f
+conventional-commit-types	package-lock.json	/^        "conventional-commit-types": "2.2.0",$/;"	f
+conventional-commit-types	package-lock.json	/^    "conventional-commit-types": {$/;"	f
+cov	package.json	/^    "cov": "yarn unit && yarn html-coverage && opn build\/coverage\/index.html",$/;"	f
+cron-parser	package.json	/^    "cron-parser": "^2.5.0",$/;"	f
+curly	tslint.json	/^    "curly": true,$/;"	f
+cz-conventional-changelog	package-lock.json	/^    "cz-conventional-changelog": {$/;"	f
+cz-conventional-changelog	package.json	/^    "cz-conventional-changelog": "^2.1.0",$/;"	f
+declaration	tsconfig.json	/^    "declaration": true,$/;"	f
+dependencies	package-lock.json	/^  "dependencies": {$/;"	f
+dependencies	package.json	/^  "dependencies": {$/;"	f
+description	package.json	/^  "description": "Universal scheduler with observables",$/;"	f
+dev	package-lock.json	/^      "dev": true$/;"	f
+dev	package-lock.json	/^      "dev": true,$/;"	f
+devDependencies	package.json	/^  "devDependencies": {$/;"	f
+docs	package.json	/^    "docs": "yarn docs:html && opn build\/docs\/index.html",$/;"	f
+docs:html	package.json	/^    "docs:html": "typedoc src\/index.ts --excludePrivate --mode file --theme minimal --out build\/docs",$/;"	f
+docs:publish	package.json	/^    "docs:publish": "yarn docs:html && gh-pages -d build\/docs",$/;"	f
+eofline	tslint.json	/^    "eofline": true,$/;"	f
+exclude	package.json	/^    "exclude": [$/;"	f
+exclude	src/tsconfig.main.json	/^  "exclude" : [$/;"	f
+extends	src/tsconfig.main.json	/^  "extends": "..\/tsconfig.json",$/;"	f
+extends	src/tsconfig.spec.json	/^  "extends": "..\/tsconfig.json",$/;"	f
+extension	package.json	/^    "extension": [$/;"	f
+forin	tslint.json	/^    "forin": true,$/;"	f
+gh-pages	package.json	/^    "gh-pages": "^1.1.0",$/;"	f
+html-coverage	package.json	/^    "html-coverage": "nyc report --reporter=html",$/;"	f
+import-blacklist	tslint.json	/^    "import-blacklist": [$/;"	f
+import-spacing	tslint.json	/^    "import-spacing": true,$/;"	f
+include	src/tsconfig.main.json	/^  "include": [$/;"	f
+include	src/tsconfig.spec.json	/^  "include": [$/;"	f
+include	tsconfig.json	/^  "include": [$/;"	f
+indent	tslint.json	/^    "indent": [$/;"	f
+index-signature	tslint.json	/^        "index-signature": "nospace",$/;"	f
+instrument	package.json	/^    "instrument": true,$/;"	f
+integrity	package-lock.json	/^      "integrity": "sha1-L0vHOQ4yROTfKT5ro1Hkx0Cnx2Q=",$/;"	f
+integrity	package-lock.json	/^      "integrity": "sha1-MKCy2jj3N3DoKUoNIuZiXtd9AJc=",$/;"	f
+integrity	package-lock.json	/^      "integrity": "sha1-XblXOdbCEqy+e29lahG5QLqmiUY=",$/;"	f
+integrity	package-lock.json	/^      "integrity": "sha1-dx7Hg540c9nEzeKLGTlMNWL09tM=",$/;"	f
+integrity	package-lock.json	/^      "integrity": "sha1-jKCMLLtbVedNr6lr9\/0aJ9VoyNA=",$/;"	f
+integrity	package-lock.json	/^      "integrity": "sha512-Hz\/mrNwitNRh\/HUAtM\/VT\/5VH+ygD6DV7mYKZAtHOrbs8U7lvPS6xf7EJKMF0uW1KJCl0H701g3ZGus+muE5vQ==",$/;"	f
+interface-over-type-literal	tslint.json	/^    "interface-over-type-literal": true,$/;"	f
+label-position	tslint.json	/^    "label-position": true,$/;"	f
+lib	tsconfig.json	/^    "lib":["es2015"],$/;"	f
+license	package.json	/^  "license": "MIT",$/;"	f
+lint	package.json	/^    "lint": "tslint --project tsconfig.json --fix",$/;"	f
+lockfileVersion	package-lock.json	/^  "lockfileVersion": 1,$/;"	f
+lodash.map	package-lock.json	/^        "lodash.map": "4.6.0",$/;"	f
+lodash.map	package-lock.json	/^    "lodash.map": {$/;"	f
+longest	package-lock.json	/^        "longest": "1.0.1",$/;"	f
+longest	package-lock.json	/^    "longest": {$/;"	f
+luxon	package.json	/^    "luxon": "^1.2.1",$/;"	f
+main	package.json	/^  "main": "dist\/index",$/;"	f
+max-line-length	tslint.json	/^    "max-line-length": [$/;"	f
+member-access	tslint.json	/^    "member-access": false,$/;"	f
+member-ordering	tslint.json	/^    "member-ordering": [$/;"	f
+module	src/tsconfig.spec.json	/^    "module": "commonjs",$/;"	f
+module	tsconfig.json	/^    "module": "commonjs",$/;"	f
+name	package-lock.json	/^  "name": "us-ts-starter",$/;"	f
+name	package.json	/^  "name": "us-scheduler",$/;"	f
+no-arg	tslint.json	/^    "no-arg": true,$/;"	f
+no-bitwise	tslint.json	/^    "no-bitwise": true,$/;"	f
+no-console	tslint.json	/^    "no-console": [$/;"	f
+no-construct	tslint.json	/^    "no-construct": true,$/;"	f
+no-debugger	tslint.json	/^    "no-debugger": true,$/;"	f
+no-duplicate-super	tslint.json	/^    "no-duplicate-super": true,$/;"	f
+no-empty	tslint.json	/^    "no-empty": false,$/;"	f
+no-empty-interface	tslint.json	/^    "no-empty-interface": false,$/;"	f
+no-eval	tslint.json	/^    "no-eval": true,$/;"	f
+no-inferrable-types	tslint.json	/^    "no-inferrable-types": [$/;"	f
+no-misused-new	tslint.json	/^    "no-misused-new": true,$/;"	f
+no-non-null-assertion	tslint.json	/^    "no-non-null-assertion": true,$/;"	f
+no-shadowed-variable	tslint.json	/^    "no-shadowed-variable": true,$/;"	f
+no-string-literal	tslint.json	/^    "no-string-literal": false,$/;"	f
+no-string-throw	tslint.json	/^    "no-string-throw": true,$/;"	f
+no-switch-case-fall-through	tslint.json	/^    "no-switch-case-fall-through": true,$/;"	f
+no-trailing-whitespace	tslint.json	/^    "no-trailing-whitespace": true,$/;"	f
+no-unnecessary-initializer	tslint.json	/^    "no-unnecessary-initializer": true,$/;"	f
+no-unused-expression	tslint.json	/^    "no-unused-expression": true,$/;"	f
+no-unused-variable	tslint.json	/^    "no-unused-variable": true,$/;"	f
+no-var-keyword	tslint.json	/^    "no-var-keyword": true,$/;"	f
+nyc	package.json	/^    "nyc": "^11.8.0",$/;"	f
+nyc	package.json	/^  "nyc": {$/;"	f
+object-literal-sort-keys	tslint.json	/^    "object-literal-sort-keys": false,$/;"	f
+one-line	tslint.json	/^    "one-line": [$/;"	f
+opn-cli	package.json	/^    "opn-cli": "^3.1.0",$/;"	f
+outDir	src/tsconfig.main.json	/^    "outDir": "..\/dist"$/;"	f
+outDir	src/tsconfig.spec.json	/^    "outDir": "..\/build\/spec",$/;"	f
+parameter	tslint.json	/^        "parameter": "nospace",$/;"	f
+path	package.json	/^      "path": ".\/node_modules\/cz-conventional-changelog"$/;"	f
+prefer-const	tslint.json	/^    "prefer-const": true,$/;"	f
+private	package.json	/^  "private": false,$/;"	f
+property-declaration	tslint.json	/^        "property-declaration": "nospace",$/;"	f
+quotemark	tslint.json	/^    "quotemark": [$/;"	f
+radix	tslint.json	/^    "radix": true,$/;"	f
+release	package.json	/^    "release": "yarn reset && yarn test && yarn build && yarn docs:publish && yarn changelog",$/;"	f
+report-dir	package.json	/^    "report-dir": ".\/build\/coverage",$/;"	f
+reporter	package.json	/^    "reporter": [$/;"	f
+requires	package-lock.json	/^      "requires": {$/;"	f
+requires	package-lock.json	/^  "requires": true,$/;"	f
+reset	package.json	/^    "reset": "git clean -dfx && git reset --hard && yarn"$/;"	f
+resolved	package-lock.json	/^      "resolved": "https:\/\/registry.npmjs.org\/conventional-commit-types\/-\/conventional-commit-types-2.2.0.tgz",$/;"	f
+resolved	package-lock.json	/^      "resolved": "https:\/\/registry.npmjs.org\/cz-conventional-changelog\/-\/cz-conventional-changelog-2.1.0.tgz",$/;"	f
+resolved	package-lock.json	/^      "resolved": "https:\/\/registry.npmjs.org\/lodash.map\/-\/lodash.map-4.6.0.tgz",$/;"	f
+resolved	package-lock.json	/^      "resolved": "https:\/\/registry.npmjs.org\/longest\/-\/longest-1.0.1.tgz",$/;"	f
+resolved	package-lock.json	/^      "resolved": "https:\/\/registry.npmjs.org\/right-pad\/-\/right-pad-1.0.1.tgz",$/;"	f
+resolved	package-lock.json	/^      "resolved": "https:\/\/registry.npmjs.org\/word-wrap\/-\/word-wrap-1.2.3.tgz",$/;"	f
+right-pad	package-lock.json	/^        "right-pad": "1.0.1",$/;"	f
+right-pad	package-lock.json	/^    "right-pad": {$/;"	f
+rules	tslint.json	/^  "rules": {$/;"	f
+rxjs	package.json	/^    "rxjs": "^6.2.0",$/;"	f
+scripts	package.json	/^  "scripts": {$/;"	f
+semicolon	tslint.json	/^    "semicolon": [$/;"	f
+snapshotDir	package.json	/^    "snapshotDir": ".\/build\/snapshots"$/;"	f
+sourceMap	package.json	/^    "sourceMap": true,$/;"	f
+sourceMap	src/tsconfig.main.json	/^  "sourceMap":false,$/;"	f
+sourceMap	src/tsconfig.spec.json	/^    "sourceMap": true$/;"	f
+sourceMap	tsconfig.json	/^    "sourceMap":true,$/;"	f
+standard-version	package.json	/^    "standard-version": "^4.4.0",$/;"	f
+strict	tsconfig.json	/^    "strict":false$/;"	f
+suncalc	package.json	/^    "suncalc": "^1.8.0"$/;"	f
+target	src/tsconfig.spec.json	/^       "target": "es6",$/;"	f
+target	tsconfig.json	/^    "target": "es6",$/;"	f
+temp-directory	package.json	/^    "temp-directory": ".\/build\/nyc_output"$/;"	f
+test	package.json	/^    "test": "yarn lint && yarn unit && yarn check-coverage",$/;"	f
+trash-cli	package.json	/^    "trash-cli": "^1.4.0",$/;"	f
+triple-equals	tslint.json	/^    "triple-equals": [$/;"	f
+ts-node	package.json	/^    "ts-node": "^6.0.5",$/;"	f
+typeRoots	tsconfig.json	/^    "typeRoots": [ "node_modules\/@types" ],$/;"	f
+typedef-whitespace	tslint.json	/^    "typedef-whitespace": [$/;"	f
+typedoc	package.json	/^    "typedoc": "^0.11.1",$/;"	f
+types	src/tsconfig.spec.json	/^    "types": [$/;"	f
+typescript	package.json	/^    "typescript": "^2.8.3"$/;"	f
+unified-signatures	tslint.json	/^    "unified-signatures": true,$/;"	f
+unit	package.json	/^    "unit": "nyc ava-ts -v src\/**\/*.spec.ts",$/;"	f
+variable-declaration	tslint.json	/^        "variable-declaration": "nospace"$/;"	f
+variable-name	tslint.json	/^    "variable-name": false,$/;"	f
+version	package-lock.json	/^      "version": "1.0.1",$/;"	f
+version	package-lock.json	/^      "version": "1.2.3",$/;"	f
+version	package-lock.json	/^      "version": "2.1.0",$/;"	f
+version	package-lock.json	/^      "version": "2.2.0",$/;"	f
+version	package-lock.json	/^      "version": "4.6.0",$/;"	f
+version	package-lock.json	/^  "version": "0.0.3",$/;"	f
+version	package.json	/^  "version": "0.0.3",$/;"	f
+watch	package.json	/^    "watch": "ava-ts -w -v src\/**\/*.spec.ts",$/;"	f
+whitespace	tslint.json	/^    "whitespace": [$/;"	f
+word-wrap	package-lock.json	/^        "word-wrap": "1.2.3"$/;"	f
+word-wrap	package-lock.json	/^    "word-wrap": {$/;"	f
