@@ -155,6 +155,7 @@ test	package.json	/^    "test": "yarn lint && yarn unit && yarn check-coverage",
 trash-cli	package.json	/^    "trash-cli": "^1.4.0",$/;"	f
 triple-equals	tslint.json	/^    "triple-equals": [$/;"	f
 ts-node	package.json	/^    "ts-node": "^6.0.5",$/;"	f
+tslint	package.json	/^    "tslint": "^5.10.0",$/;"	f
 typeRoots	tsconfig.json	/^    "typeRoots": [ "node_modules\/@types" ],$/;"	f
 typedef-whitespace	tslint.json	/^    "typedef-whitespace": [$/;"	f
 typedoc	package.json	/^    "typedoc": "^0.11.1",$/;"	f
@@ -169,8 +170,8 @@ version	package-lock.json	/^      "version": "1.2.3",$/;"	f
 version	package-lock.json	/^      "version": "2.1.0",$/;"	f
 version	package-lock.json	/^      "version": "2.2.0",$/;"	f
 version	package-lock.json	/^      "version": "4.6.0",$/;"	f
-version	package-lock.json	/^  "version": "0.0.3",$/;"	f
-version	package.json	/^  "version": "0.0.3",$/;"	f
+version	package-lock.json	/^  "version": "0.1.0",$/;"	f
+version	package.json	/^  "version": "0.1.0",$/;"	f
 watch	package.json	/^    "watch": "ava-ts -w -v src\/**\/*.spec.ts",$/;"	f
 whitespace	tslint.json	/^    "whitespace": [$/;"	f
 word-wrap	package-lock.json	/^        "word-wrap": "1.2.3"$/;"	f

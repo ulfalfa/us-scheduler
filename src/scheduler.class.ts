@@ -83,7 +83,11 @@ export class UsScheduler {
     return this._now ? this._now : DateTime.local();
   }
 
-  public setCustomTimes(...times: string[]) {
+  /**
+   * set new custom times (overwriting existing custom times with same labels)
+   * @param  ...times some new custom times (format: HH:mm(label) where label is optional)
+   */
+  public setCustomTimes(...times: string[]): void {
     times.forEach((time: string) => {
       const parsed = time.match(TIMES_MATCHER);
       if (parsed) {
