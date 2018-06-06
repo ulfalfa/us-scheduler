@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.2.0"></a>
+# [0.2.0](https://github.com/ulfalfa/us-scheduler/compare/v0.1.1...v0.2.0) (2018-06-06)
+
+
+### Features
+
+* **scheduler:** the suntimes are also returned for already passed events on the day ([6474233](https://github.com/ulfalfa/us-scheduler/commit/6474233))
+
+
+
 <a name="0.1.1"></a>
 ## [0.1.1](https://github.com/ulfalfa/us-scheduler/compare/v0.1.0...v0.1.1) (2018-06-03)
 
