@@ -170,8 +170,8 @@ version	package-lock.json	/^      "version": "1.2.3",$/;"	f
 version	package-lock.json	/^      "version": "2.1.0",$/;"	f
 version	package-lock.json	/^      "version": "2.2.0",$/;"	f
 version	package-lock.json	/^      "version": "4.6.0",$/;"	f
-version	package-lock.json	/^  "version": "0.1.0",$/;"	f
-version	package.json	/^  "version": "0.1.0",$/;"	f
+version	package-lock.json	/^  "version": "0.1.1",$/;"	f
+version	package.json	/^  "version": "0.1.1",$/;"	f
 watch	package.json	/^    "watch": "ava-ts -w -v src\/**\/*.spec.ts",$/;"	f
 whitespace	tslint.json	/^    "whitespace": [$/;"	f
 word-wrap	package-lock.json	/^        "word-wrap": "1.2.3"$/;"	f

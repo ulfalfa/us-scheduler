@@ -4,7 +4,14 @@ import * as cronParser from 'cron-parser';
 import { DateTime, Duration } from 'luxon';
 
 import { Observable, of, timer } from 'rxjs';
-import { map, concatMap, filter, delay, expand } from 'rxjs/operators';
+import {
+  map,
+  concatMap,
+  filter,
+  delay,
+  expand,
+  debounceTime,
+} from 'rxjs/operators';
 
 /**
  * Options for creating an object UsScheduler
@@ -136,14 +143,16 @@ export class UsScheduler {
       startTime = start || this.now;
     }
     const sctimes = Suncalc.getTimes(
-      startTime.toJSDate(),
+      startTime.toUTC(0, { keepLocalTime: true }).toJSDate(),
       this._opts.latitude,
       this._opts.longitude,
     );
     const allTimes = Object.keys(sctimes)
       .map((key: string) => ({
         label: key,
-        date: DateTime.fromJSDate(sctimes[key]),
+        date: DateTime.fromJSDate(sctimes[key]).setZone('local', {
+          keepCalendarTime: true,
+        }),
       }))
       .filter((date: ILabeledDate) => date.date.isValid)
 
@@ -151,9 +160,6 @@ export class UsScheduler {
       .filter(
         (date: ILabeledDate) =>
           labelFilter.length === 0 || labelFilter.indexOf(date.label) > -1,
-      )
-      .filter(
-        (date: ILabeledDate) => date.date.diff(startTime).milliseconds >= 0,
       )
       .sort(
         (_t1: ILabeledDate, _t2: ILabeledDate) =>
@@ -222,19 +228,20 @@ export class UsScheduler {
   ): Observable<ILabeledDate> {
     const times = this.generateCronedSunTimes(dayPattern, ...labels);
 
-    return of({ label: START_LABEL, date: this.now }).pipe(
+    const start = times.next().value;
+    start.waitMS = Math.max(start.date.diff(this.now).milliseconds, 0);
+    return of(start).pipe(
+      delay(start.waitMS),
       expand((time: ILabeledDate) => {
         return of(times.next().value).pipe(
           map((date: ILabeledDate) => {
-            date.waitMS = date.date.diff(time.date).milliseconds;
+            const maxDate = DateTime.max(time.date, this.now);
+            date.waitMS = Math.max(0, date.date.diff(maxDate).milliseconds);
             return date;
           }),
-          concatMap((date: ILabeledDate) => {
-            return of(date).pipe(delay(date.waitMS));
-          }),
+          concatMap((date: ILabeledDate) => of(date).pipe(delay(date.waitMS))),
         );
       }),
-      filter((date: ILabeledDate) => date.label !== START_LABEL),
     );
   }
 
