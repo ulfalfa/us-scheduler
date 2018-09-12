@@ -18,28 +18,21 @@
     "test": "yarn lint && yarn unit && yarn check-coverage",
     "cov": "yarn unit && yarn html-coverage && opn build/coverage/index.html",
     "docs": "yarn docs:html && opn build/docs/index.html",
-    "docs:html": "typedoc src/index.ts --excludePrivate --mode file --theme minimal --out build/docs",
+    "docs:html":
+      "typedoc src/index.ts --excludePrivate --mode file --theme minimal --out build/docs",
     "docs:publish": "yarn docs:html && gh-pages -d build/docs",
     "changelog": "standard-version",
-    "release": "yarn reset && yarn test && yarn build && yarn docs:publish && yarn changelog",
+    "release":
+      "yarn reset && yarn test && yarn build && yarn docs:publish && yarn changelog",
     "reset": "git clean -dfx && git reset --hard && yarn"
   },
   "ava": {
     "snapshotDir": "./build/snapshots"
   },
   "nyc": {
-    "exclude": [
-      "**/*.js",
-      "**/*.d.ts",
-      "**/*.spec.ts"
-    ],
-    "extension": [
-      ".ts"
-    ],
-    "reporter": [
-      "html",
-      "text"
-    ],
+    "exclude": ["**/*.js", "**/*.d.ts", "**/*.spec.ts"],
+    "extension": [".ts"],
+    "reporter": ["html", "text"],
     "cache": true,
     "sourceMap": true,
     "instrument": true,
@@ -61,13 +54,16 @@
     "ts-node": "^6.0.5",
     "tslint": "^5.10.0",
     "typedoc": "^0.11.1",
-    "typescript": "^2.8.3"
+    "typescript": "^2.8.3",
+    "rxjs": "^6.2.0"
   },
   "dependencies": {
     "cron-parser": "^2.5.0",
     "luxon": "^1.2.1",
-    "rxjs": "^6.2.0",
     "suncalc": "^1.8.0"
+  },
+  "peerDependencies": {
+    "rxjs": "^6.2.0"
   },
   "config": {
     "commitizen": {
