@@ -6,16 +6,17 @@ import { DateTime, Duration } from 'luxon';
 import { Observable, of, timer } from 'rxjs';
 import {
   map,
-  concatMap,
-  filter,
   delay,
   expand,
+  skip,
 } from 'rxjs/operators';
+
+const debug = require('debug')('us-scheduler:scheduler');
 
 /**
  * Options for creating an object UsScheduler
  */
-export interface ISchedulerOptions {
+export interface SchedulerOptions {
   /** latitude for sun calculations */
   latitude: number;
   /** longitude for sun calculations */
@@ -58,22 +59,52 @@ export interface ILabeledDate {
   waitMS?: number;
 }
 
-const CRON_LABEL = '___cron___';
-const START_LABEL = '___start___';
+export interface Times {
+  _start_: DateTime,
+  [name: string]: DateTime
+}
+
+
+export type SimpleTime = string;
+function isSimpleTime(val: any): val is SimpleTime {
+  return typeof val === 'string';
+}
+
+
+export type TimeDefinition = SimpleTime;
+
+export interface ScheduleEvent {
+  index: number,
+  definition?: TimeDefinition,
+  date: DateTime,
+}
+
+export interface SchedulingOptions {
+  events: SimpleTime[],
+  random: number,
+  dayCronPattern: string,
+}
+
+export type DateInput = DateTime | Date | string;
+
+
+const START_LABEL = '_start_';
 
 // const TIMES_MATCHER = /(?:(\b1?[0-9]|\b2[0-3]):([0-5][0-9]))(?:\((.+?)\))?/g;
 const TIMES_MATCHER = /(?:(\b1?[0-9]|\b2[0-3]):([0-5][0-9]))(?:\((.+?)\))?/;
 export const LABEL_PATTERN = /^[a-zA-Z0-9\:_]*$/;
+export const TIME_PATTERN = /(\d\d):(\d\d)/;
 /**
  * the main class for doing all the scheduling
  */
 export class UsScheduler {
   protected _now: DateTime = null;
+
   protected _customTimes: {
     [label: string]: ITime;
   } = {};
 
-  constructor(protected _opts: ISchedulerOptions) {
+  constructor(protected _opts: SchedulerOptions) {
     if (this._opts.now) {
       this._now = DateTime.fromISO(this._opts.now);
     }
@@ -122,51 +153,32 @@ export class UsScheduler {
       };
     });
   }
-  /**
-   * calculates the sun times for the location and adds
-   * the custom times.
-   * @param  forDay          the day for which the times should be calculated
-   * @param  ...labelFilter filter for labels (e.g. only get sunsets and sunrise)
-   * @return                Iterator for the sorted times
-   */
-  public *generateSunTimes(
-    start?: DateTime | string,
-    ...labelFilter: string[]
-  ): IterableIterator<ILabeledDate> {
-    let startTime: DateTime;
 
-    if (typeof start === 'string') {
-      labelFilter.push(start);
-      startTime = this.now;
-    } else {
-      startTime = start || this.now;
-    }
+
+
+  getTimes(startTime: DateTime): Times {
     const sctimes = Suncalc.getTimes(
-      startTime.toUTC(0, { keepLocalTime: true }).toJSDate(),
+      startTime.startOf('day').toUTC(0, { keepLocalTime: true }).toJSDate(),
       this._opts.latitude,
       this._opts.longitude,
     );
-    const allTimes = Object.keys(sctimes)
-      .map((key: string) => ({
-        label: key,
-        date: DateTime.fromJSDate(sctimes[key]).setZone('local', {
-          keepCalendarTime: true,
-        }),
-      }))
-      .filter((date: ILabeledDate) => date.date.isValid)
+    const resTimes: Times = Object.keys(sctimes).reduce((times, cur) => {
+      times[cur] = DateTime.fromJSDate(sctimes[cur]).setZone('local', {
+        keepCalendarTime: true,
+      })
+      return times;
 
-      .concat(this.getCustomTimes(startTime))
-      .filter(
-        (date: ILabeledDate) =>
-          labelFilter.length === 0 || labelFilter.indexOf(date.label) > -1,
-      )
-      .sort(
-        (_t1: ILabeledDate, _t2: ILabeledDate) =>
-          _t1.date.diff(_t2.date).milliseconds,
-      );
-    for (let i = 0; i < allTimes.length; i++) {
-      yield allTimes[i];
-    }
+    }, { _start_: startTime.startOf('day') })
+
+
+    Object.keys(this._customTimes).forEach((key) => {
+      const newDate = startTime.set(this._customTimes[key]).startOf('minute');
+      resTimes[key] = newDate
+    });
+
+
+
+    return resTimes
   }
 
   /**
@@ -174,128 +186,146 @@ export class UsScheduler {
    * @param  cronPattern cronpattern (s. wiki)
    * @return             an iterator of labeled dates
    */
-  public *generateCron(cronPattern: string): IterableIterator<ILabeledDate> {
+  public *generateCron(cronPattern: string): IterableIterator<DateTime> {
+    debug(`Generating cron "${cronPattern}" for`, this.now)
     const times = cronParser.parseExpression(cronPattern, {
       iterator: false,
       utc: false,
-      currentDate: this.now.toJSDate(),
+      currentDate: this.now.toLocal().toJSDate(),
     });
     while (true) {
-      yield {
-        label: CRON_LABEL,
-        date: DateTime.fromJSDate(times.next().toDate()),
-      };
+      yield DateTime.fromJSDate(times.next().toDate())
     }
   }
 
-  /**
-   * returns an iterator of suntimes repeating via a cron (only day based)
-   * @param  dayPattern     cron weekday (*= all days, 6,7= weekends...)
-   * @param  ...labelFilter filter for labels (only sunsets...)
-   * @return                iterator of labeled dates
-   */
-  public *generateCronedSunTimes(
-    dayPattern?: string,
-    ...labelFilter: string[]
-  ): IterableIterator<ILabeledDate> {
-    if (dayPattern && !dayPattern.match(/[,\d\*\-]+/)) {
-      labelFilter.push(dayPattern);
-      dayPattern = '*';
-    } else {
-      dayPattern = dayPattern || '*';
-    }
-    const cronPattern = '0 0 * * ' + dayPattern;
 
-    yield* this.generateSunTimes(this.now, ...labelFilter);
 
-    const cron = this.generateCron(cronPattern);
-    while (true) {
-      const date = cron.next().value;
-      yield* this.generateSunTimes(date.date, ...labelFilter);
-    }
-  }
+  *generateSchedule(events: SimpleTime[] | SchedulingOptions)
+    : IterableIterator<ScheduleEvent> {
 
-  /**
-   * the main scheduler for daytimes. every emit is scheduled
-   * @param  dayPattern a week day cron filter (e.g. only weekends)
-   * @param  ...labels  filter for wanted dates
-   * @return            time observable (endless)
-   */
-  public observeSunTimes(
-    dayPattern?: string,
-    ...labels: string[]
-  ): Observable<ILabeledDate> {
-    const times = this.generateCronedSunTimes(dayPattern, ...labels);
+    function resolveSimpleTime(event: SimpleTime, curTimes: Times): DateTime {
 
-    const start = times.next().value;
-    start.waitMS = Math.max(start.date.diff(this.now).milliseconds, 0);
-    return of(start).pipe(
-      delay(start.waitMS),
-      expand((time: ILabeledDate) => {
-        return of(times.next().value).pipe(
-          map((date: ILabeledDate) => {
-            const maxDate = DateTime.max(time.date, this.now);
-            date.waitMS = Math.max(0, date.date.diff(maxDate).milliseconds);
-            return date;
-          }),
-          concatMap((date: ILabeledDate) => of(date).pipe(delay(date.waitMS))),
-        );
-      }),
-    );
-  }
-
-  /**
-   * returns an observable cron stream
-   * @param  cronPattern a standard cron pattern
-   * {@link https://github.com/harrisiirak/cron-parser | cron-parser}
-   * @return             observable stream
-   */
-  public observeCron(cronPattern: string): Observable<ILabeledDate> {
-    const cron = this.generateCron(cronPattern);
-
-    return of({ label: START_LABEL, date: this.now }).pipe(
-      expand((time: ILabeledDate) => {
-        return of(cron.next().value).pipe(
-          map((date: ILabeledDate) => {
-            date.waitMS = date.date.diff(time.date).milliseconds;
-            return date;
-          }),
-          concatMap((date: ILabeledDate) => {
-            return of(date).pipe(delay(date.waitMS));
-          }),
-        );
-      }),
-      filter((date: ILabeledDate) => date.label !== START_LABEL),
-    );
-  }
-  /**
-   * schedule either a cron pattern or suntimes
-   * @param  pattern either a cron pattern or the first filter for the suntimes
-   * @param  ...pars more filters. the last one can be a weekday cron filter
-   * @return         a timed observable of labeled dates
-   */
-  public schedule(
-    pattern: string = '* * * * * *',
-    ...pars: string[]
-  ): Observable<ILabeledDate> {
-    if (pattern.match(LABEL_PATTERN)) {
-      pars.splice(0, 0, pattern);
-      if (pars[pars.length - 1].match(LABEL_PATTERN)) {
-        const [dayPattern] = pars.splice(-1, 1);
-        return this.observeSunTimes(dayPattern, ...pars);
+      if (curTimes[event]) {
+        return curTimes[event]
       } else {
-        return this.observeSunTimes(...pars);
+        const match = event.match(TIME_PATTERN);
+        if (match) {
+          const [, hour, min] = match;
+          return curTimes[START_LABEL].set({ hour: parseInt(hour, 10), minute: parseInt(min, 10) })
+
+        } else {
+
+          throw new Error(`${event} is neither predefined nor a valid time (HH:mm)`);
+        }
+      };
+
+    }
+
+
+
+    const options: SchedulingOptions = (Array.isArray(events)) ? { events, random: 0, dayCronPattern: '* * *' } : events;
+
+
+
+    // we need a daily cron (noon)
+    const cron = this.generateCron('59 59 23 ' + options.dayCronPattern);
+
+    let date = cron.next().value;
+    let times = this.getTimes(date);
+    let lastTarget = times[START_LABEL].minus({ seconds: 1 });
+    while (true) {
+
+
+      for (let index = 0; index < options.events.length; index++) {
+
+        const curEvent = options.events[index];
+        let target: DateTime;
+        // if (isSimpleTime(curEvent)) {
+        target = resolveSimpleTime(curEvent, times);
+        /*} else {
+          throw new Error(`currently only simple times allowed`)
+        }*/
+
+        if (options.random > 0) {
+          const minutes = Math.floor(Math.random() * (2 * options.random + 1)) - options.random;
+          target = target.plus({ minutes })
+        }
+
+        if (target <= lastTarget) {
+
+          target = target.plus({ days: 1 });
+
+          date = cron.next().value;
+          times = this.getTimes(date);
+        }
+
+        yield {
+          date: target,
+          index,
+          definition: curEvent
+        }
+        lastTarget = target;
       }
-    } else {
-      return this.observeCron(pattern);
     }
   }
+
+  /**
+    * schedule either a cron pattern or suntimes
+    * @param  pattern either a cron pattern or the first filter for the suntimes
+    * @param  ...pars more filters. the last one can be a weekday cron filter
+    * @return         a timed observable of labeled dates
+    */
+
+  schedule(eventOrOpts: SimpleTime | SchedulingOptions,
+    ...events: SimpleTime[]): Observable<ScheduleEvent> {
+
+    let schedule: IterableIterator<ScheduleEvent>
+
+    if (isSimpleTime(eventOrOpts)) {
+      schedule = this.generateSchedule([eventOrOpts, ...events]);
+    } else {
+      schedule = this.generateSchedule(eventOrOpts as SchedulingOptions)
+    }
+
+    return of({
+      date: this.now
+    }).pipe(
+      expand((current, idx) => {
+        const next = schedule.next().value
+        debug(`Croning from ${current.date.toISO()} to ${next.date.toISO()}`);
+        return of(next).pipe(delay(next.date.valueOf() - current.date.valueOf()))
+      }),
+      skip(1),
+
+    );
+  }
+  /**
+    * returns an observable cron stream
+    * @param  cronPattern a standard cron pattern
+    * {@link https://github.com/harrisiirak/cron-parser | cron-parser}
+    * @return             observable stream
+    *
+    */
+
+  cron(cronPattern: string): Observable<number> {
+    const cron = this.generateCron(cronPattern);
+    return of(this.now).pipe(
+      expand((curDate, idx) => {
+        const next = cron.next().value
+        debug(`Croning from ${curDate.toISO()} to ${next.toISO()}`);
+        return of(next).pipe(delay(next.valueOf() - curDate.valueOf()))
+      }),
+      skip(1),
+      map((_, idx) => idx)
+    );
+  }
+
   /**
    * emits after a specified duration
    * @param  duration either a duration in ISO8601 (without the P) or seconds
    * @return          observable, that fires after duration is over;
    */
-  public in(duration: string | number): Observable<ILabeledDate> {
+  public in(duration: string | number): Observable<ScheduleEvent> {
     let d: Duration;
     if (typeof duration === 'string') {
       d = Duration.fromISO('PT' + duration.toUpperCase());
@@ -306,10 +336,36 @@ export class UsScheduler {
     const finish = this.now.plus(d);
     return timer(d.as('milliseconds')).pipe(
       map(() => ({
-        label: '___timer___',
+        index: 0,
         date: finish,
-        waitMS: d.as('milliseconds'),
       })),
     );
   }
+
+  public at(date: DateTime): Observable<ScheduleEvent> {
+    return timer(date.valueOf() - this.now.valueOf()).pipe(
+      map(() => {
+        return {
+          index: 0,
+          date: date,
+        }
+      })
+    )
+
+  }
+
+
+
+
+
+  /*public cron(cronPattern: string): Observable<any> {
+    const cron = this.createCron(cronPattern);
+
+    return cron.pipe(
+      expand(() => {
+        cron.next()
+        return cron;
+      })
+    )
+  }*/
 }
