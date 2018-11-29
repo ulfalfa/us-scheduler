@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.0.0"></a>
+# [1.0.0](https://github.com/ulfalfa/us-scheduler/compare/v0.2.1...v1.0.0) (2018-11-29)
+
+
+### Features
+
+* **rewritten:** rewritten from scratch (other parametlines) ([ee97150](https://github.com/ulfalfa/us-scheduler/commit/ee97150))
+
+
+### BREAKING CHANGES
+
+* **rewritten:** complete rewrite
+
+
+
 <a name="0.2.1"></a>
 ## [0.2.1](https://github.com/ulfalfa/us-scheduler/compare/v0.2.0...v0.2.1) (2018-09-12)
 
