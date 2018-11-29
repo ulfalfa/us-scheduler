@@ -928,25 +928,25 @@ img { max-width: 100%; }
 					<a href="usscheduler.html#now" class="tsd-kind-icon">now</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
+					<a href="usscheduler.html#at" class="tsd-kind-icon">at</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
+					<a href="usscheduler.html#cron" class="tsd-kind-icon">cron</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
 					<a href="usscheduler.html#generatecron" class="tsd-kind-icon">generate<wbr>Cron</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<a href="usscheduler.html#generatecronedsuntimes" class="tsd-kind-icon">generate<wbr>Croned<wbr>Sun<wbr>Times</a>
-				</li>
-				<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<a href="usscheduler.html#generatesuntimes" class="tsd-kind-icon">generate<wbr>Sun<wbr>Times</a>
+					<a href="usscheduler.html#generateschedule" class="tsd-kind-icon">generate<wbr>Schedule</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
 					<a href="usscheduler.html#getcustomtimes" class="tsd-kind-icon">get<wbr>Custom<wbr>Times</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
+					<a href="usscheduler.html#gettimes" class="tsd-kind-icon">get<wbr>Times</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
 					<a href="usscheduler.html#in" class="tsd-kind-icon">in</a>
-				</li>
-				<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<a href="usscheduler.html#observecron" class="tsd-kind-icon">observe<wbr>Cron</a>
-				</li>
-				<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<a href="usscheduler.html#observesuntimes" class="tsd-kind-icon">observe<wbr>Sun<wbr>Times</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
 					<a href="usscheduler.html#schedule" class="tsd-kind-icon">schedule</a>
@@ -960,13 +960,28 @@ img { max-width: 100%; }
 			<a href="../interfaces/ilabeleddate.html" class="tsd-kind-icon">ILabeled<wbr>Date</a>
 		</li>
 		<li class=" tsd-kind-interface tsd-is-external">
-			<a href="../interfaces/ischeduleroptions.html" class="tsd-kind-icon">IScheduler<wbr>Options</a>
-		</li>
-		<li class=" tsd-kind-interface tsd-is-external">
 			<a href="../interfaces/itime.html" class="tsd-kind-icon">ITime</a>
 		</li>
-		<li class=" tsd-kind-variable tsd-is-external tsd-is-not-exported">
-			<a href="../globals.html#cron_label" class="tsd-kind-icon">CRON_<wbr>LABEL</a>
+		<li class=" tsd-kind-interface tsd-is-external">
+			<a href="../interfaces/scheduleevent.html" class="tsd-kind-icon">Schedule<wbr>Event</a>
+		</li>
+		<li class=" tsd-kind-interface tsd-is-external">
+			<a href="../interfaces/scheduleroptions.html" class="tsd-kind-icon">Scheduler<wbr>Options</a>
+		</li>
+		<li class=" tsd-kind-interface tsd-is-external">
+			<a href="../interfaces/schedulingoptions.html" class="tsd-kind-icon">Scheduling<wbr>Options</a>
+		</li>
+		<li class=" tsd-kind-interface tsd-is-external">
+			<a href="../interfaces/times.html" class="tsd-kind-icon">Times</a>
+		</li>
+		<li class=" tsd-kind-type-alias tsd-is-external">
+			<a href="../globals.html#dateinput" class="tsd-kind-icon">Date<wbr>Input</a>
+		</li>
+		<li class=" tsd-kind-type-alias tsd-is-external">
+			<a href="../globals.html#simpletime" class="tsd-kind-icon">Simple<wbr>Time</a>
+		</li>
+		<li class=" tsd-kind-type-alias tsd-is-external">
+			<a href="../globals.html#timedefinition" class="tsd-kind-icon">Time<wbr>Definition</a>
 		</li>
 		<li class=" tsd-kind-variable tsd-is-external">
 			<a href="../globals.html#label_pattern" class="tsd-kind-icon">LABEL_<wbr>PATTERN</a>
@@ -976,6 +991,15 @@ img { max-width: 100%; }
 		</li>
 		<li class=" tsd-kind-variable tsd-is-external tsd-is-not-exported">
 			<a href="../globals.html#times_matcher" class="tsd-kind-icon">TIMES_<wbr>MATCHER</a>
+		</li>
+		<li class=" tsd-kind-variable tsd-is-external">
+			<a href="../globals.html#time_pattern" class="tsd-kind-icon">TIME_<wbr>PATTERN</a>
+		</li>
+		<li class=" tsd-kind-variable tsd-is-external tsd-is-not-exported">
+			<a href="../globals.html#debug" class="tsd-kind-icon">debug</a>
+		</li>
+		<li class=" tsd-kind-function tsd-is-external tsd-is-not-exported">
+			<a href="../globals.html#issimpletime" class="tsd-kind-icon">is<wbr>Simple<wbr>Time</a>
 		</li>
 	</ul>
 </nav>
@@ -1023,13 +1047,13 @@ img { max-width: 100%; }
 					<section class="tsd-index-section tsd-is-external">
 						<h3>Methods</h3>
 						<ul class="tsd-index-list">
+							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="usscheduler.html#at" class="tsd-kind-icon">at</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="usscheduler.html#cron" class="tsd-kind-icon">cron</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="usscheduler.html#generatecron" class="tsd-kind-icon">generate<wbr>Cron</a></li>
-							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="usscheduler.html#generatecronedsuntimes" class="tsd-kind-icon">generate<wbr>Croned<wbr>Sun<wbr>Times</a></li>
-							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="usscheduler.html#generatesuntimes" class="tsd-kind-icon">generate<wbr>Sun<wbr>Times</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="usscheduler.html#generateschedule" class="tsd-kind-icon">generate<wbr>Schedule</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="usscheduler.html#getcustomtimes" class="tsd-kind-icon">get<wbr>Custom<wbr>Times</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="usscheduler.html#gettimes" class="tsd-kind-icon">get<wbr>Times</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="usscheduler.html#in" class="tsd-kind-icon">in</a></li>
-							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="usscheduler.html#observecron" class="tsd-kind-icon">observe<wbr>Cron</a></li>
-							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="usscheduler.html#observesuntimes" class="tsd-kind-icon">observe<wbr>Sun<wbr>Times</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="usscheduler.html#schedule" class="tsd-kind-icon">schedule</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="usscheduler.html#setcustomtimes" class="tsd-kind-icon">set<wbr>Custom<wbr>Times</a></li>
 						</ul>
@@ -1043,19 +1067,19 @@ img { max-width: 100%; }
 				<a name="constructor" class="tsd-anchor"></a>
 				<h3>constructor</h3>
 				<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-external">
-					<li class="tsd-signature tsd-kind-icon">new <wbr>UsScheduler<span class="tsd-signature-symbol">(</span>_opts<span class="tsd-signature-symbol">: </span><a href="../interfaces/ischeduleroptions.html" class="tsd-signature-type">ISchedulerOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="usscheduler.html" class="tsd-signature-type">UsScheduler</a></li>
+					<li class="tsd-signature tsd-kind-icon">new <wbr>UsScheduler<span class="tsd-signature-symbol">(</span>_opts<span class="tsd-signature-symbol">: </span><a href="../interfaces/scheduleroptions.html" class="tsd-signature-type">SchedulerOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="usscheduler.html" class="tsd-signature-type">UsScheduler</a></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/10f5ab8/src/scheduler.class.ts#L74">scheduler.class.ts:74</a></li>
+								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/ee97150/src/scheduler.class.ts#L105">scheduler.class.ts:105</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
-								<h5>_opts: <a href="../interfaces/ischeduleroptions.html" class="tsd-signature-type">ISchedulerOptions</a></h5>
+								<h5>_opts: <a href="../interfaces/scheduleroptions.html" class="tsd-signature-type">SchedulerOptions</a></h5>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="usscheduler.html" class="tsd-signature-type">UsScheduler</a></h4>
@@ -1071,7 +1095,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">_custom<wbr>Times<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/10f5ab8/src/scheduler.class.ts#L72">scheduler.class.ts:72</a></li>
+						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/ee97150/src/scheduler.class.ts#L103">scheduler.class.ts:103</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-type-declaration">
@@ -1089,17 +1113,17 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">_now<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">DateTime</span><span class="tsd-signature-symbol"> =&nbsp;null</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/10f5ab8/src/scheduler.class.ts#L71">scheduler.class.ts:71</a></li>
+						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/ee97150/src/scheduler.class.ts#L101">scheduler.class.ts:101</a></li>
 					</ul>
 				</aside>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected tsd-is-external">
 				<a name="_opts" class="tsd-anchor"></a>
 				<h3><span class="tsd-flag ts-flagProtected">Protected</span> _opts</h3>
-				<div class="tsd-signature tsd-kind-icon">_opts<span class="tsd-signature-symbol">:</span> <a href="../interfaces/ischeduleroptions.html" class="tsd-signature-type">ISchedulerOptions</a></div>
+				<div class="tsd-signature tsd-kind-icon">_opts<span class="tsd-signature-symbol">:</span> <a href="../interfaces/scheduleroptions.html" class="tsd-signature-type">SchedulerOptions</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/10f5ab8/src/scheduler.class.ts#L76">scheduler.class.ts:76</a></li>
+						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/ee97150/src/scheduler.class.ts#L107">scheduler.class.ts:107</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1112,7 +1136,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">now<span class="tsd-signature-symbol">:</span> </div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/10f5ab8/src/scheduler.class.ts#L88">scheduler.class.ts:88</a></li>
+						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/ee97150/src/scheduler.class.ts#L119">scheduler.class.ts:119</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
@@ -1125,16 +1149,72 @@ img { max-width: 100%; }
 		<section class="tsd-panel-group tsd-member-group tsd-is-external">
 			<h2>Methods</h2>
 			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-				<a name="generatecron" class="tsd-anchor"></a>
-				<h3>generate<wbr>Cron</h3>
+				<a name="at" class="tsd-anchor"></a>
+				<h3>at</h3>
 				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<li class="tsd-signature tsd-kind-icon">generate<wbr>Cron<span class="tsd-signature-symbol">(</span>cronPattern<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/ilabeleddate.html" class="tsd-signature-type">ILabeledDate</a><span class="tsd-signature-symbol">&gt;</span></li>
+					<li class="tsd-signature tsd-kind-icon">at<span class="tsd-signature-symbol">(</span>date<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">DateTime</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/scheduleevent.html" class="tsd-signature-type">ScheduleEvent</a><span class="tsd-signature-symbol">&gt;</span></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/10f5ab8/src/scheduler.class.ts#L177">scheduler.class.ts:177</a></li>
+								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/ee97150/src/scheduler.class.ts#L345">scheduler.class.ts:345</a></li>
+							</ul>
+						</aside>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>date: <span class="tsd-signature-type">DateTime</span></h5>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/scheduleevent.html" class="tsd-signature-type">ScheduleEvent</a><span class="tsd-signature-symbol">&gt;</span></h4>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
+				<a name="cron" class="tsd-anchor"></a>
+				<h3>cron</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
+					<li class="tsd-signature tsd-kind-icon">cron<span class="tsd-signature-symbol">(</span>cronPattern<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/ee97150/src/scheduler.class.ts#L310">scheduler.class.ts:310</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>returns an observable cron stream</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>cronPattern: <span class="tsd-signature-type">string</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>a standard cron pattern
+									<a href="https://github.com/harrisiirak/cron-parser " class="external"> cron-parser</a></p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						<p>observable stream</p>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
+				<a name="generatecron" class="tsd-anchor"></a>
+				<h3>generate<wbr>Cron</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
+					<li class="tsd-signature tsd-kind-icon">generate<wbr>Cron<span class="tsd-signature-symbol">(</span>cronPattern<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">DateTime</span><span class="tsd-signature-symbol">&gt;</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/ee97150/src/scheduler.class.ts#L189">scheduler.class.ts:189</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1151,76 +1231,31 @@ img { max-width: 100%; }
 								</div>
 							</li>
 						</ul>
-						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/ilabeleddate.html" class="tsd-signature-type">ILabeledDate</a><span class="tsd-signature-symbol">&gt;</span></h4>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">DateTime</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						<p>an iterator of labeled dates</p>
 					</li>
 				</ul>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-				<a name="generatecronedsuntimes" class="tsd-anchor"></a>
-				<h3>generate<wbr>Croned<wbr>Sun<wbr>Times</h3>
+				<a name="generateschedule" class="tsd-anchor"></a>
+				<h3>generate<wbr>Schedule</h3>
 				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<li class="tsd-signature tsd-kind-icon">generate<wbr>Croned<wbr>Sun<wbr>Times<span class="tsd-signature-symbol">(</span>dayPattern<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, <span class="tsd-signature-symbol">...</span>labelFilter<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/ilabeleddate.html" class="tsd-signature-type">ILabeledDate</a><span class="tsd-signature-symbol">&gt;</span></li>
+					<li class="tsd-signature tsd-kind-icon">generate<wbr>Schedule<span class="tsd-signature-symbol">(</span>events<span class="tsd-signature-symbol">: </span><a href="../globals.html#simpletime" class="tsd-signature-type">SimpleTime</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/schedulingoptions.html" class="tsd-signature-type">SchedulingOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/scheduleevent.html" class="tsd-signature-type">ScheduleEvent</a><span class="tsd-signature-symbol">&gt;</span></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/10f5ab8/src/scheduler.class.ts#L197">scheduler.class.ts:197</a></li>
+								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/ee97150/src/scheduler.class.ts#L203">scheduler.class.ts:203</a></li>
 							</ul>
 						</aside>
-						<div class="tsd-comment tsd-typography">
-							<div class="lead">
-								<p>returns an iterator of suntimes repeating via a cron (only day based)</p>
-							</div>
-						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
-								<h5><span class="tsd-flag ts-flagOptional">Optional</span> dayPattern: <span class="tsd-signature-type">string</span></h5>
-								<div class="tsd-comment tsd-typography">
-									<p>cron weekday (*= all days, 6,7= weekends...)</p>
-								</div>
-							</li>
-							<li>
-								<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>labelFilter: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+								<h5>events: <a href="../globals.html#simpletime" class="tsd-signature-type">SimpleTime</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/schedulingoptions.html" class="tsd-signature-type">SchedulingOptions</a></h5>
 							</li>
 						</ul>
-						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/ilabeleddate.html" class="tsd-signature-type">ILabeledDate</a><span class="tsd-signature-symbol">&gt;</span></h4>
-						<p>iterator of labeled dates</p>
-					</li>
-				</ul>
-			</section>
-			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-				<a name="generatesuntimes" class="tsd-anchor"></a>
-				<h3>generate<wbr>Sun<wbr>Times</h3>
-				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<li class="tsd-signature tsd-kind-icon">generate<wbr>Sun<wbr>Times<span class="tsd-signature-symbol">(</span>start<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">DateTime</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span>, <span class="tsd-signature-symbol">...</span>labelFilter<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/ilabeleddate.html" class="tsd-signature-type">ILabeledDate</a><span class="tsd-signature-symbol">&gt;</span></li>
-				</ul>
-				<ul class="tsd-descriptions">
-					<li class="tsd-description">
-						<aside class="tsd-sources">
-							<ul>
-								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/10f5ab8/src/scheduler.class.ts#L132">scheduler.class.ts:132</a></li>
-							</ul>
-						</aside>
-						<div class="tsd-comment tsd-typography">
-							<div class="lead">
-								<p>calculates the sun times for the location and adds
-								the custom times.</p>
-							</div>
-						</div>
-						<h4 class="tsd-parameters-title">Parameters</h4>
-						<ul class="tsd-parameters">
-							<li>
-								<h5><span class="tsd-flag ts-flagOptional">Optional</span> start: <span class="tsd-signature-type">DateTime</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
-							</li>
-							<li>
-								<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>labelFilter: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
-							</li>
-						</ul>
-						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/ilabeleddate.html" class="tsd-signature-type">ILabeledDate</a><span class="tsd-signature-symbol">&gt;</span></h4>
-						<p>Iterator for the sorted times</p>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/scheduleevent.html" class="tsd-signature-type">ScheduleEvent</a><span class="tsd-signature-symbol">&gt;</span></h4>
 					</li>
 				</ul>
 			</section>
@@ -1234,7 +1269,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/10f5ab8/src/scheduler.class.ts#L115">scheduler.class.ts:115</a></li>
+								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/ee97150/src/scheduler.class.ts#L146">scheduler.class.ts:146</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1258,16 +1293,39 @@ img { max-width: 100%; }
 				</ul>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-				<a name="in" class="tsd-anchor"></a>
-				<h3>in</h3>
+				<a name="gettimes" class="tsd-anchor"></a>
+				<h3>get<wbr>Times</h3>
 				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<li class="tsd-signature tsd-kind-icon">in<span class="tsd-signature-symbol">(</span>duration<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/ilabeleddate.html" class="tsd-signature-type">ILabeledDate</a><span class="tsd-signature-symbol">&gt;</span></li>
+					<li class="tsd-signature tsd-kind-icon">get<wbr>Times<span class="tsd-signature-symbol">(</span>startTime<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">DateTime</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/times.html" class="tsd-signature-type">Times</a></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/10f5ab8/src/scheduler.class.ts#L298">scheduler.class.ts:298</a></li>
+								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/ee97150/src/scheduler.class.ts#L159">scheduler.class.ts:159</a></li>
+							</ul>
+						</aside>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>startTime: <span class="tsd-signature-type">DateTime</span></h5>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <a href="../interfaces/times.html" class="tsd-signature-type">Times</a></h4>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
+				<a name="in" class="tsd-anchor"></a>
+				<h3>in</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
+					<li class="tsd-signature tsd-kind-icon">in<span class="tsd-signature-symbol">(</span>duration<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/scheduleevent.html" class="tsd-signature-type">ScheduleEvent</a><span class="tsd-signature-symbol">&gt;</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/ee97150/src/scheduler.class.ts#L328">scheduler.class.ts:328</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1284,76 +1342,8 @@ img { max-width: 100%; }
 								</div>
 							</li>
 						</ul>
-						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/ilabeleddate.html" class="tsd-signature-type">ILabeledDate</a><span class="tsd-signature-symbol">&gt;</span></h4>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/scheduleevent.html" class="tsd-signature-type">ScheduleEvent</a><span class="tsd-signature-symbol">&gt;</span></h4>
 						<p>observable, that fires after duration is over;</p>
-					</li>
-				</ul>
-			</section>
-			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-				<a name="observecron" class="tsd-anchor"></a>
-				<h3>observe<wbr>Cron</h3>
-				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<li class="tsd-signature tsd-kind-icon">observe<wbr>Cron<span class="tsd-signature-symbol">(</span>cronPattern<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/ilabeleddate.html" class="tsd-signature-type">ILabeledDate</a><span class="tsd-signature-symbol">&gt;</span></li>
-				</ul>
-				<ul class="tsd-descriptions">
-					<li class="tsd-description">
-						<aside class="tsd-sources">
-							<ul>
-								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/10f5ab8/src/scheduler.class.ts#L253">scheduler.class.ts:253</a></li>
-							</ul>
-						</aside>
-						<div class="tsd-comment tsd-typography">
-							<div class="lead">
-								<p>returns an observable cron stream</p>
-							</div>
-						</div>
-						<h4 class="tsd-parameters-title">Parameters</h4>
-						<ul class="tsd-parameters">
-							<li>
-								<h5>cronPattern: <span class="tsd-signature-type">string</span></h5>
-								<div class="tsd-comment tsd-typography">
-									<p>a standard cron pattern
-									<a href="https://github.com/harrisiirak/cron-parser " class="external"> cron-parser</a></p>
-								</div>
-							</li>
-						</ul>
-						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/ilabeleddate.html" class="tsd-signature-type">ILabeledDate</a><span class="tsd-signature-symbol">&gt;</span></h4>
-						<p>observable stream</p>
-					</li>
-				</ul>
-			</section>
-			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-				<a name="observesuntimes" class="tsd-anchor"></a>
-				<h3>observe<wbr>Sun<wbr>Times</h3>
-				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<li class="tsd-signature tsd-kind-icon">observe<wbr>Sun<wbr>Times<span class="tsd-signature-symbol">(</span>dayPattern<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, <span class="tsd-signature-symbol">...</span>labels<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/ilabeleddate.html" class="tsd-signature-type">ILabeledDate</a><span class="tsd-signature-symbol">&gt;</span></li>
-				</ul>
-				<ul class="tsd-descriptions">
-					<li class="tsd-description">
-						<aside class="tsd-sources">
-							<ul>
-								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/10f5ab8/src/scheduler.class.ts#L224">scheduler.class.ts:224</a></li>
-							</ul>
-						</aside>
-						<div class="tsd-comment tsd-typography">
-							<div class="lead">
-								<p>the main scheduler for daytimes. every emit is scheduled</p>
-							</div>
-						</div>
-						<h4 class="tsd-parameters-title">Parameters</h4>
-						<ul class="tsd-parameters">
-							<li>
-								<h5><span class="tsd-flag ts-flagOptional">Optional</span> dayPattern: <span class="tsd-signature-type">string</span></h5>
-								<div class="tsd-comment tsd-typography">
-									<p>a week day cron filter (e.g. only weekends)</p>
-								</div>
-							</li>
-							<li>
-								<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>labels: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
-							</li>
-						</ul>
-						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/ilabeleddate.html" class="tsd-signature-type">ILabeledDate</a><span class="tsd-signature-symbol">&gt;</span></h4>
-						<p>time observable (endless)</p>
 					</li>
 				</ul>
 			</section>
@@ -1361,13 +1351,13 @@ img { max-width: 100%; }
 				<a name="schedule" class="tsd-anchor"></a>
 				<h3>schedule</h3>
 				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<li class="tsd-signature tsd-kind-icon">schedule<span class="tsd-signature-symbol">(</span>pattern<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, <span class="tsd-signature-symbol">...</span>pars<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/ilabeleddate.html" class="tsd-signature-type">ILabeledDate</a><span class="tsd-signature-symbol">&gt;</span></li>
+					<li class="tsd-signature tsd-kind-icon">schedule<span class="tsd-signature-symbol">(</span>eventOrOpts<span class="tsd-signature-symbol">: </span><a href="../globals.html#simpletime" class="tsd-signature-type">SimpleTime</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/schedulingoptions.html" class="tsd-signature-type">SchedulingOptions</a>, <span class="tsd-signature-symbol">...</span>events<span class="tsd-signature-symbol">: </span><a href="../globals.html#simpletime" class="tsd-signature-type">SimpleTime</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/scheduleevent.html" class="tsd-signature-type">ScheduleEvent</a><span class="tsd-signature-symbol">&gt;</span></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/10f5ab8/src/scheduler.class.ts#L277">scheduler.class.ts:277</a></li>
+								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/ee97150/src/scheduler.class.ts#L279">scheduler.class.ts:279</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1378,16 +1368,13 @@ img { max-width: 100%; }
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
-								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> pattern: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;* * * * * *&quot;</span></h5>
-								<div class="tsd-comment tsd-typography">
-									<p>either a cron pattern or the first filter for the suntimes</p>
-								</div>
+								<h5>eventOrOpts: <a href="../globals.html#simpletime" class="tsd-signature-type">SimpleTime</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/schedulingoptions.html" class="tsd-signature-type">SchedulingOptions</a></h5>
 							</li>
 							<li>
-								<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>pars: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+								<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>events: <a href="../globals.html#simpletime" class="tsd-signature-type">SimpleTime</a><span class="tsd-signature-symbol">[]</span></h5>
 							</li>
 						</ul>
-						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/ilabeleddate.html" class="tsd-signature-type">ILabeledDate</a><span class="tsd-signature-symbol">&gt;</span></h4>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/scheduleevent.html" class="tsd-signature-type">ScheduleEvent</a><span class="tsd-signature-symbol">&gt;</span></h4>
 						<p>a timed observable of labeled dates</p>
 					</li>
 				</ul>
@@ -1402,7 +1389,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/10f5ab8/src/scheduler.class.ts#L96">scheduler.class.ts:96</a></li>
+								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/ee97150/src/scheduler.class.ts#L127">scheduler.class.ts:127</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
