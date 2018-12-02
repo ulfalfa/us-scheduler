@@ -353,19 +353,4 @@ export class UsScheduler {
     )
 
   }
-
-
-
-
-
-  /*public cron(cronPattern: string): Observable<any> {
-    const cron = this.createCron(cronPattern);
-
-    return cron.pipe(
-      expand(() => {
-        cron.next()
-        return cron;
-      })
-    )
-  }*/
 }
