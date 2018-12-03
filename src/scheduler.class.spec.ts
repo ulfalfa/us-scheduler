@@ -395,3 +395,74 @@ test('Test "at" with with date', (t) => {
 });
 
 
+test('Get sun positions', (t) => {
+  const uss = new UsScheduler({
+    latitude: 53.46,
+    longitude: 9.95,
+    now: '2018-06-21T00:00:00.000+02:00',
+  });
+
+  const testScheduler = new TestScheduler((actual, expected) => {
+    t.deepEqual(actual.map(data => data.notification.value)
+      .filter(val => !!val).map(val => `${val.date.toLocaleString(DateTime.TIME_24_SIMPLE)}->${val.altitude}:${val.azimuth}`), [
+        '00:00->-11.058210928105565:340.80724297361286',
+        '01:00->-12.94959986675356:354.737435251469',
+        '02:00->-12.67045436487025:8.841442814497839',
+        '03:00->-10.246158235834509:22.657955988062895',
+        '04:00->-5.884420738770536:35.83631462096258',
+        '05:00->0.091081157020682:48.2460396541143',
+        '06:00->7.3173425772348635:59.98121512425939',
+        '07:00->15.440337142319958:71.31417277538556',
+        '08:00->24.125631066965223:82.66507680428259',
+        '09:00->33.03617643029865:94.62408183494017',
+        '10:00->41.776708556354436:108.04024204696903',
+        '11:00->49.78917354922111:124.15260977864862',
+        '12:00->56.18759178273318:144.5127363171751',
+        '13:00->59.68027319782755:169.7512337844286',
+        '14:00->59.15340045988221:196.9550073380081',
+        '15:00->54.80020238968144:221.06755737205611',
+        '16:00->47.889539405434284:240.22634451217849',
+        '17:00->39.62739149202212:255.52205131906737',
+        '18:00->30.800674110215823:268.4737635018476',
+        '19:00->21.913220135060982:280.2128544878379',
+        '20:00->13.338201788529172:291.51149692949133',
+        '21:00->5.408238553379683:302.91155807835696',
+        '22:00->-1.538209289378797:314.796455102687',
+        '23:00->-7.1424530641723525:327.3981470556306',
+      ]);
+  });
+
+  // This test will actually run *synchronously*
+  testScheduler.run(({ cold, expectObservable }) => {
+    const output = uss.sunPositions(60).pipe(
+      take(24),
+    );
+
+
+
+    expectObservable(output).toBe('');
+  });
+})
+test('Get sun positions with default parameter 5 minutes', (t) => {
+  const uss = new UsScheduler({
+    latitude: 53.46,
+    longitude: 9.95,
+    now: '2018-06-21T00:00:00.000+02:00',
+  });
+
+  const testScheduler = new TestScheduler((actual, expected) => {
+    t.deepEqual(actual.map(data => data.notification.value)
+      .filter(val => !!val).map(val => `${val.date.toLocaleString(DateTime.TIME_24_SIMPLE)}->${val.altitude}:${val.azimuth}`), [
+        '00:00->-11.058210928105565:340.80724297361286',
+        '00:05->-11.295793451802831:341.95074353280586',
+      ]);
+  });
+
+  // This test will actually run *synchronously*
+  testScheduler.run(({ cold, expectObservable }) => {
+    const output = uss.sunPositions().pipe(
+      take(2),
+    );
+    expectObservable(output).toBe('');
+  });
+})

@@ -54,6 +54,17 @@ export interface ScheduleEvent {
   definition?: TimeDefinition,
   date: DateTime,
 }
+/**
+ * SunPosition event
+ */
+export interface SunPosition {
+  /** the azimuth in degrees (0° means north, 180° south) */
+  azimuth: number,
+  /** the altitude of sun in degrees relative to horizon (0° means horizon) */
+  altitude: number,
+  /** the date of the sample */
+  date: DateTime
+}
 
 export interface SchedulingOptions {
   times: SimpleTime[],
@@ -359,5 +370,24 @@ export class UsScheduler {
       })
     )
 
+  }
+  /**
+   * get the current sunpositions
+   *
+   * @param minutes refresh interval in minutes
+   */
+
+  sunPositions(minutes: number = 5): Observable<SunPosition> {
+    return of(this.now).pipe(
+      expand((curDate, idx) => {
+        const next = curDate.plus({ minutes })
+        debug(`Croning from ${curDate.toISO()} to ${next.toISO()}`);
+        return of(next).pipe(delay(next.valueOf() - curDate.valueOf()))
+      }),
+      map((date) => {
+        const { azimuth, altitude } = Suncalc.getPosition(date.toJSDate(), this._opts.latitude, this._opts.longitude);
+        return { date: date, azimuth: azimuth * 180 / Math.PI + 180, altitude: altitude * 180 / Math.PI };
+      })
+    );
   }
 }
