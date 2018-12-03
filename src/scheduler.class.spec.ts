@@ -1,11 +1,7 @@
 import { test } from 'ava';
-import { UsScheduler, ScheduleEvent } from './scheduler.class';
+import { UsScheduler, ScheduleEvent, DateTime } from './scheduler.class';
 import { take, map } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
-import { DateTime } from 'luxon';
-
-
-
 
 test.beforeEach('Initialize scheduler', (t) => {
   t.context.uss = new UsScheduler({
@@ -37,20 +33,23 @@ test('Initializable and setting of now', (t) => {
   });
   t.log(`Starttime (given time): ${uss.now.toISO()}`);
   t.is(uss.now.toISO(), '2018-06-28T00:00:00.000+02:00');
+
+  uss.now = DateTime.fromISO('2018-12-27T23:12:00.000+01:00')
+  t.is(uss.now.toISO(), '2018-12-27T23:12:00.000+01:00');
 });
 
 test('parsing custom times', (t) => {
   const dates = t.context.uss.getCustomTimes(
     DateTime.fromISO('2018-12-28T12:00:00.000+0100'),
   );
-  t.deepEqual(dates, [
-    { label: '22:30', date: DateTime.fromISO('2018-12-28T22:30:00.000+01:00') },
+  t.deepEqual(dates,
     {
-      label: 'wakeup',
-      date: DateTime.fromISO('2018-12-28T06:30:00.000+01:00'),
-    },
-    { label: '12:00', date: DateTime.fromISO('2018-12-28T12:00:00.000+01:00') },
-  ]);
+      '_start_': DateTime.fromISO('2018-12-28T00:00:00.000+01:00'),
+      '22:30': DateTime.fromISO('2018-12-28T22:30:00.000+01:00'),
+      'wakeup': DateTime.fromISO('2018-12-28T06:30:00.000+01:00'),
+      '12:00': DateTime.fromISO('2018-12-28T12:00:00.000+01:00')
+    }
+  );
 });
 test('parsing empty custom times', (t) => {
   const uss = new UsScheduler({
@@ -59,7 +58,8 @@ test('parsing empty custom times', (t) => {
   });
   const dates = uss.getCustomTimes();
 
-  t.deepEqual(dates, []);
+  t.is(Object.keys(dates).length, 1);
+  t.truthy(dates.hasOwnProperty('_start_'));
 });
 
 test('get all times', (t) => {
@@ -71,8 +71,6 @@ test('get all times', (t) => {
     res[key] = dates[key].toISO()
     return res;
   }, {})
-
-
   t.deepEqual(convDates, {
     '12:00': '2018-12-28T12:00:00.000+01:00',
     '22:30': '2018-12-28T22:30:00.000+01:00',
@@ -107,6 +105,23 @@ test('Generates a cron starting from now', (t) => {
   t.is(cron.next().value.toISO(), '2018-06-28T12:30:00.000+02:00');
   t.is(cron.next().value.toISO(), '2018-06-29T12:30:00.000+02:00');
   t.is(cron.next().value.toISO(), '2018-06-30T12:30:00.000+02:00');
+
+
+
+});
+
+test('Generates a cron starting from now', (t) => {
+  const uss = new UsScheduler({
+    latitude: 53.54,
+    longitude: 9.98,
+    now: '2018-06-28T12:29:03.000+0200',
+  });
+  const cron = uss.generateCron('0 0 12 * * 1');
+
+  t.is(cron.next().value.toISO(), '2018-07-02T12:00:00.000+02:00');
+  t.is(cron.next().value.toISO(), '2018-07-09T12:00:00.000+02:00');
+  t.is(cron.next(DateTime.fromISO('2018-07-12T12:30:00.000+02:00')).value.toISO(), '2018-07-16T12:00:00.000+02:00')
+  t.is(cron.next().value.toISO(), '2018-07-23T12:00:00.000+02:00');
 
 
 
@@ -182,6 +197,27 @@ test('Generates a simple schedule with day change', (t) => {
     '2-2018-07-02T22:00:00.000+02:00']);
 })
 
+test('Generates a schedule with day change and weekly cron pattern', (t) => {
+  const uss = new UsScheduler({
+    latitude: 53.54,
+    longitude: 9.98,
+    now: '2018-06-28T12:29:03.000+0200',
+    customTimes: '6:30(wakeup)',
+  });
+  const schedule = uss.generateSchedule({
+    times: ['21:00', '20:00', '22:00', '19:00', '23:00'], random: 0, dayCronPattern: '* * 1'
+  });
+
+  t.deepEqual(sampleEvents(schedule, 8, 1), ['0-2018-07-02T21:00:00.000+02:00',
+    '1-2018-07-03T20:00:00.000+02:00',
+    '2-2018-07-03T22:00:00.000+02:00',
+    '3-2018-07-04T19:00:00.000+02:00',
+    '4-2018-07-04T23:00:00.000+02:00',
+    '0-2018-07-09T21:00:00.000+02:00',
+    '1-2018-07-10T20:00:00.000+02:00',
+    '2-2018-07-10T22:00:00.000+02:00']);
+})
+
 test('Generates a simple schedule with randomization', (t) => {
   const uss = new UsScheduler({
     latitude: 53.54,
@@ -189,7 +225,7 @@ test('Generates a simple schedule with randomization', (t) => {
     now: '2018-06-28T12:29:03.000+0200',
     customTimes: '6:30(wakeup)',
   });
-  const schedule = uss.generateSchedule({ events: ['18:00'], random: 15, dayCronPattern: '* * *' });
+  const schedule = uss.generateSchedule({ times: ['18:00'], random: 15, dayCronPattern: '* * *' });
 
 
   for (let i = 0; i < 100; i++) {
@@ -263,7 +299,7 @@ test('Scheduling with complex options', t => {
 
   // This test will actually run *synchronously*
   testScheduler.run(({ cold, expectObservable }) => {
-    const output = uss.schedule({ events: ['13:00'], random: 0, dayCronPattern: '* * *' }).pipe(
+    const output = uss.schedule({ times: ['13:00'], random: 0, dayCronPattern: '* * *' }).pipe(
       map(event => `${event.date.toISO()}-${event.index}`),
       take(3),
     );

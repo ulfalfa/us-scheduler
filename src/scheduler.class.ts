@@ -1,7 +1,8 @@
 import * as Suncalc from 'suncalc';
 import * as cronParser from 'cron-parser';
 
-import { DateTime, Duration } from 'luxon';
+import { DateTime, DateObjectUnits, Duration } from 'luxon';
+export { DateTime } from 'luxon';
 
 import { Observable, of, timer } from 'rxjs';
 import {
@@ -11,7 +12,12 @@ import {
   skip,
 } from 'rxjs/operators';
 
+
 const debug = require('debug')('us-scheduler:scheduler');
+
+const CUSTOM_TIMES_PATTERN = /(?:(\b1?[0-9]|\b2[0-3]):([0-5][0-9]))(?:\((.+?)\))?/;
+const TIME_PATTERN = /(\d\d):(\d\d)/;
+const START_LABEL = '_start_';
 
 /**
  * Options for creating an object UsScheduler
@@ -28,39 +34,9 @@ export interface SchedulerOptions {
   /** optional startTime used a now in ISO Format(mainly for testing purposes) */
   now?: string;
 }
-/**
- * Interface for all returned date items (e.g. label = 'sunset')
- */
-export interface ITime {
-  /**
-   * hour of day (24h format)
-   */
-  hour: number;
-  /**
-   * minute of houer
-   */
-  minute: number;
-}
 
-/**
- * a key value pair of label and datetime
- */
-export interface ILabeledDate {
-  /** the name of the time (eg. noon, sunset or custom names) */
-  label: string;
-  /** the date of the specific point of day
-   *(s.{@link https://moment.github.io/luxon/docs/class/src/datetime.js~DateTime.html | luxon})
-   **/
-  date: DateTime;
-  /**
-   * only used internally for scheduling (how long to wait)
-   *
-   */
-  waitMS?: number;
-}
-
-export interface Times {
-  _start_: DateTime,
+export interface DayTimes {
+  [START_LABEL]: DateTime,
   [name: string]: DateTime
 }
 
@@ -80,20 +56,12 @@ export interface ScheduleEvent {
 }
 
 export interface SchedulingOptions {
-  events: SimpleTime[],
+  times: SimpleTime[],
   random: number,
   dayCronPattern: string,
 }
 
-export type DateInput = DateTime | Date | string;
 
-
-const START_LABEL = '_start_';
-
-// const TIMES_MATCHER = /(?:(\b1?[0-9]|\b2[0-3]):([0-5][0-9]))(?:\((.+?)\))?/g;
-const TIMES_MATCHER = /(?:(\b1?[0-9]|\b2[0-3]):([0-5][0-9]))(?:\((.+?)\))?/;
-export const LABEL_PATTERN = /^[a-zA-Z0-9\:_]*$/;
-export const TIME_PATTERN = /(\d\d):(\d\d)/;
 /**
  * the main class for doing all the scheduling
  */
@@ -101,7 +69,7 @@ export class UsScheduler {
   protected _now: DateTime = null;
 
   protected _customTimes: {
-    [label: string]: ITime;
+    [label: string]: DateObjectUnits;
   } = {};
 
   constructor(protected _opts: SchedulerOptions) {
@@ -119,6 +87,13 @@ export class UsScheduler {
   public get now(): DateTime {
     return this._now ? this._now : DateTime.local();
   }
+  /**
+ * sets the current time (overrides the now option)
+ * @return the current time
+ */
+  public set now(now: DateTime) {
+    this._now = now;
+  }
 
   /**
    * set new custom times (overwriting existing custom times with same labels)
@@ -126,7 +101,7 @@ export class UsScheduler {
    */
   public setCustomTimes(...times: string[]): void {
     times.forEach((time: string) => {
-      const parsed = time.match(TIMES_MATCHER);
+      const parsed = time.match(CUSTOM_TIMES_PATTERN);
       if (parsed) {
         const [timeStr, hour, min, label] = parsed;
         this._customTimes[label || timeStr] = {
@@ -143,67 +118,101 @@ export class UsScheduler {
    * @param  forDay the day the times should be generated for
    * @return        array of labeled dates
    */
-  public getCustomTimes(forDay: DateTime = this.now): ILabeledDate[] {
-    return Object.keys(this._customTimes).map((key) => {
-      const newDate = forDay.set(this._customTimes[key]).startOf('minute');
+  public getCustomTimes(forDay: DateTime = this.now): DayTimes {
 
-      return {
-        label: key,
-        date: newDate,
-      };
-    });
+    return Object.keys(this._customTimes).reduce((times, cur) => {
+      times[cur] = forDay.set(this._customTimes[cur]).setZone('local', {
+        keepCalendarTime: true,
+      }).startOf('minute')
+      return times;
+
+    }, { [START_LABEL]: forDay.startOf('day') })
   }
 
 
-
-  getTimes(startTime: DateTime): Times {
+  /**
+   * generates the suntimes and combining existing custom times
+   * @param startTime the day to generate the day times for
+   */
+  getTimes(startTime: DateTime): DayTimes {
     const sctimes = Suncalc.getTimes(
       startTime.startOf('day').toUTC(0, { keepLocalTime: true }).toJSDate(),
       this._opts.latitude,
       this._opts.longitude,
     );
-    const resTimes: Times = Object.keys(sctimes).reduce((times, cur) => {
+    let resTimes: DayTimes = Object.keys(sctimes).reduce((times, cur) => {
       times[cur] = DateTime.fromJSDate(sctimes[cur]).setZone('local', {
         keepCalendarTime: true,
       })
       return times;
 
-    }, { _start_: startTime.startOf('day') })
+    }, { [START_LABEL]: startTime.startOf('day') })
 
-
-    Object.keys(this._customTimes).forEach((key) => {
-      const newDate = startTime.set(this._customTimes[key]).startOf('minute');
-      resTimes[key] = newDate
-    });
-
-
+    resTimes = { ...resTimes, ...this.getCustomTimes(startTime) }
 
     return resTimes
   }
 
   /**
    * return a cron iterator for a given cron pattern
-   * @param  cronPattern cronpattern (s. wiki)
+   * @param  cronPattern cronpattern
+   *    ```
+   *    *    *    *    *    *    *
+   *    ┬    ┬    ┬    ┬    ┬    ┬
+   *    │    │    │    │    │    |
+   *    │    │    │    │    │    └ day of week (0 - 7) (0 or 7 is Sun)
+    *    │    │    │    │    └───── month (1 - 12)
+    *    │    │    │    └────────── day of month (1 - 31)
+    *    │    │    └─────────────── hour (0 - 23)
+    *    │    └──────────────────── minute (0 - 59)
+    *    └───────────────────────── second (0 - 59, optional)
+    *    ```
+    * Supported are following patterns
+    * * \* every unit
+    * * \*&#8205;/5 every fifth unit
+    * * 0-5 range of units
+    *
+    * the pattern ist interpreted with {@link https://github.com/harrisiirak/cron-parser}
    * @return             an iterator of labeled dates
    */
   public *generateCron(cronPattern: string): IterableIterator<DateTime> {
     debug(`Generating cron "${cronPattern}" for`, this.now)
-    const times = cronParser.parseExpression(cronPattern, {
+    let times = cronParser.parseExpression(cronPattern, {
       iterator: false,
       utc: false,
       currentDate: this.now.toLocal().toJSDate(),
     });
     while (true) {
-      yield DateTime.fromJSDate(times.next().toDate())
+
+      const newDate: DateTime = yield DateTime.fromJSDate(times.next().toDate())
+      if (newDate) {
+        debug(`Generating cron "${cronPattern}" for`, this.now)
+        times = cronParser.parseExpression(cronPattern, {
+          iterator: false,
+          utc: false,
+          currentDate: newDate.toLocal().toJSDate(),
+        });
+      }
     }
   }
 
 
-
-  *generateSchedule(events: SimpleTime[] | SchedulingOptions)
+  /**
+    * generate a  daytimes schedule as iterator
+    *
+    * simple use: e.g. schedule('sunrise','12:23','sunset'...)
+    * or specify scheduling options (with possibility of randomizing each time or in a not daily cron pattern)
+    *
+    * this method is mainly used by schedule
+    *
+    * @param  eventOrOpts either a options object or the first daytime
+    * @param  ...times more times.
+    * @return a iterator of schedule events
+    */
+  *generateSchedule(times: SimpleTime[] | SchedulingOptions)
     : IterableIterator<ScheduleEvent> {
 
-    function resolveSimpleTime(event: SimpleTime, curTimes: Times): DateTime {
+    function resolveSimpleTime(event: SimpleTime, curTimes: DayTimes): DateTime {
 
       if (curTimes[event]) {
         return curTimes[event]
@@ -214,37 +223,28 @@ export class UsScheduler {
           return curTimes[START_LABEL].set({ hour: parseInt(hour, 10), minute: parseInt(min, 10) })
 
         } else {
-
           throw new Error(`${event} is neither predefined nor a valid time (HH:mm)`);
         }
       };
 
     }
 
-
-
-    const options: SchedulingOptions = (Array.isArray(events)) ? { events, random: 0, dayCronPattern: '* * *' } : events;
-
-
+    const options: SchedulingOptions = (Array.isArray(times)) ? { times, random: 0, dayCronPattern: '* * *' } : times;
 
     // we need a daily cron (noon)
     const cron = this.generateCron('59 59 23 ' + options.dayCronPattern);
 
     let date = cron.next().value;
-    let times = this.getTimes(date);
-    let lastTarget = times[START_LABEL].minus({ seconds: 1 });
+    let dayTimes = this.getTimes(date);
+    let lastTarget = dayTimes[START_LABEL].minus({ seconds: 1 });
     while (true) {
 
 
-      for (let index = 0; index < options.events.length; index++) {
+      for (let index = 0; index < options.times.length; index++) {
 
-        const curEvent = options.events[index];
+        const curEvent = options.times[index];
         let target: DateTime;
-        // if (isSimpleTime(curEvent)) {
-        target = resolveSimpleTime(curEvent, times);
-        /*} else {
-          throw new Error(`currently only simple times allowed`)
-        }*/
+        target = resolveSimpleTime(curEvent, dayTimes);
 
         if (options.random > 0) {
           const minutes = Math.floor(Math.random() * (2 * options.random + 1)) - options.random;
@@ -252,11 +252,8 @@ export class UsScheduler {
         }
 
         if (target <= lastTarget) {
-
           target = target.plus({ days: 1 });
-
-          date = cron.next().value;
-          times = this.getTimes(date);
+          dayTimes = this.getTimes(target);
         }
 
         yield {
@@ -266,23 +263,28 @@ export class UsScheduler {
         }
         lastTarget = target;
       }
+      date = cron.next(lastTarget).value;
+      dayTimes = this.getTimes(date);
     }
   }
 
   /**
-    * schedule either a cron pattern or suntimes
-    * @param  pattern either a cron pattern or the first filter for the suntimes
-    * @param  ...pars more filters. the last one can be a weekday cron filter
-    * @return         a timed observable of labeled dates
+    * schedule at regular daytimes
+    *
+    * simple use: e.g. schedule('sunrise','12:23','sunset'...)
+    * or specify scheduling options (with possibility of randomizing each time or in a not daily cron pattern)
+    *
+    * @param  eventOrOpts either a options object or the first daytime
+    * @param  ...times more times.
+    * @return a timed observable of schedule events
     */
-
   schedule(eventOrOpts: SimpleTime | SchedulingOptions,
-    ...events: SimpleTime[]): Observable<ScheduleEvent> {
+    ...times: SimpleTime[]): Observable<ScheduleEvent> {
 
     let schedule: IterableIterator<ScheduleEvent>
 
     if (isSimpleTime(eventOrOpts)) {
-      schedule = this.generateSchedule([eventOrOpts, ...events]);
+      schedule = this.generateSchedule([eventOrOpts, ...times]);
     } else {
       schedule = this.generateSchedule(eventOrOpts as SchedulingOptions)
     }
@@ -299,10 +301,11 @@ export class UsScheduler {
 
     );
   }
+
   /**
     * returns an observable cron stream
     * @param  cronPattern a standard cron pattern
-    * {@link https://github.com/harrisiirak/cron-parser | cron-parser}
+    * @see {@link generateCron} for detailed pattern description
     * @return             observable stream
     *
     */
@@ -322,7 +325,7 @@ export class UsScheduler {
 
   /**
    * emits after a specified duration
-   * @param  duration either a duration in ISO8601 (without the P) or seconds
+   * @param  duration either a duration as ISO8601 string (without the PT) or number of seconds
    * @return          observable, that fires after duration is over;
    */
   public in(duration: string | number): Observable<ScheduleEvent> {
@@ -342,6 +345,10 @@ export class UsScheduler {
     );
   }
 
+  /**
+   * Fire an observable event at a decent datetime
+   * @param date an input datetime object (luxon DateTime)
+   */
   public at(date: DateTime): Observable<ScheduleEvent> {
     return timer(date.valueOf() - this.now.valueOf()).pipe(
       map(() => {
