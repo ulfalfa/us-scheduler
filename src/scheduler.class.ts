@@ -17,7 +17,7 @@ const debug = require('debug')('us-scheduler:scheduler');
 
 const CUSTOM_TIMES_PATTERN = /(?:(\b1?[0-9]|\b2[0-3]):([0-5][0-9]))(?:\((.+?)\))?/;
 const TIME_PATTERN = /(\d\d):(\d\d)/;
-const START_LABEL = '_start_';
+export const START_LABEL = '_start_';
 
 /**
  * Options for creating an object UsScheduler
