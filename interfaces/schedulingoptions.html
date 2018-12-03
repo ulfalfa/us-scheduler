@@ -913,10 +913,7 @@ img { max-width: 100%; }
 			<a href="../classes/usscheduler.html" class="tsd-kind-icon">Us<wbr>Scheduler</a>
 		</li>
 		<li class=" tsd-kind-interface tsd-is-external">
-			<a href="ilabeleddate.html" class="tsd-kind-icon">ILabeled<wbr>Date</a>
-		</li>
-		<li class=" tsd-kind-interface tsd-is-external">
-			<a href="itime.html" class="tsd-kind-icon">ITime</a>
+			<a href="daytimes.html" class="tsd-kind-icon">Day<wbr>Times</a>
 		</li>
 		<li class=" tsd-kind-interface tsd-is-external">
 			<a href="scheduleevent.html" class="tsd-kind-icon">Schedule<wbr>Event</a>
@@ -931,18 +928,12 @@ img { max-width: 100%; }
 					<a href="schedulingoptions.html#daycronpattern" class="tsd-kind-icon">day<wbr>Cron<wbr>Pattern</a>
 				</li>
 				<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-					<a href="schedulingoptions.html#events" class="tsd-kind-icon">events</a>
-				</li>
-				<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
 					<a href="schedulingoptions.html#random" class="tsd-kind-icon">random</a>
 				</li>
+				<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
+					<a href="schedulingoptions.html#times" class="tsd-kind-icon">times</a>
+				</li>
 			</ul>
-		</li>
-		<li class=" tsd-kind-interface tsd-is-external">
-			<a href="times.html" class="tsd-kind-icon">Times</a>
-		</li>
-		<li class=" tsd-kind-type-alias tsd-is-external">
-			<a href="../globals.html#dateinput" class="tsd-kind-icon">Date<wbr>Input</a>
 		</li>
 		<li class=" tsd-kind-type-alias tsd-is-external">
 			<a href="../globals.html#simpletime" class="tsd-kind-icon">Simple<wbr>Time</a>
@@ -950,16 +941,13 @@ img { max-width: 100%; }
 		<li class=" tsd-kind-type-alias tsd-is-external">
 			<a href="../globals.html#timedefinition" class="tsd-kind-icon">Time<wbr>Definition</a>
 		</li>
-		<li class=" tsd-kind-variable tsd-is-external">
-			<a href="../globals.html#label_pattern" class="tsd-kind-icon">LABEL_<wbr>PATTERN</a>
-		</li>
 		<li class=" tsd-kind-variable tsd-is-external tsd-is-not-exported">
+			<a href="../globals.html#custom_times_pattern" class="tsd-kind-icon">CUSTOM_<wbr>TIMES_<wbr>PATTERN</a>
+		</li>
+		<li class=" tsd-kind-variable tsd-is-external">
 			<a href="../globals.html#start_label" class="tsd-kind-icon">START_<wbr>LABEL</a>
 		</li>
 		<li class=" tsd-kind-variable tsd-is-external tsd-is-not-exported">
-			<a href="../globals.html#times_matcher" class="tsd-kind-icon">TIMES_<wbr>MATCHER</a>
-		</li>
-		<li class=" tsd-kind-variable tsd-is-external">
 			<a href="../globals.html#time_pattern" class="tsd-kind-icon">TIME_<wbr>PATTERN</a>
 		</li>
 		<li class=" tsd-kind-variable tsd-is-external tsd-is-not-exported">
@@ -988,8 +976,8 @@ img { max-width: 100%; }
 						<h3>Properties</h3>
 						<ul class="tsd-index-list">
 							<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="schedulingoptions.html#daycronpattern" class="tsd-kind-icon">day<wbr>Cron<wbr>Pattern</a></li>
-							<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="schedulingoptions.html#events" class="tsd-kind-icon">events</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="schedulingoptions.html#random" class="tsd-kind-icon">random</a></li>
+							<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="schedulingoptions.html#times" class="tsd-kind-icon">times</a></li>
 						</ul>
 					</section>
 				</div>
@@ -1003,17 +991,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">day<wbr>Cron<wbr>Pattern<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/ee97150/src/scheduler.class.ts#L85">scheduler.class.ts:85</a></li>
-					</ul>
-				</aside>
-			</section>
-			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-				<a name="events" class="tsd-anchor"></a>
-				<h3>events</h3>
-				<div class="tsd-signature tsd-kind-icon">events<span class="tsd-signature-symbol">:</span> <a href="../globals.html#simpletime" class="tsd-signature-type">SimpleTime</a><span class="tsd-signature-symbol">[]</span></div>
-				<aside class="tsd-sources">
-					<ul>
-						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/ee97150/src/scheduler.class.ts#L83">scheduler.class.ts:83</a></li>
+						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/2d372dd/src/scheduler.class.ts#L61">scheduler.class.ts:61</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1023,7 +1001,17 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">random<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/ee97150/src/scheduler.class.ts#L84">scheduler.class.ts:84</a></li>
+						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/2d372dd/src/scheduler.class.ts#L60">scheduler.class.ts:60</a></li>
+					</ul>
+				</aside>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
+				<a name="times" class="tsd-anchor"></a>
+				<h3>times</h3>
+				<div class="tsd-signature tsd-kind-icon">times<span class="tsd-signature-symbol">:</span> <a href="../globals.html#simpletime" class="tsd-signature-type">SimpleTime</a><span class="tsd-signature-symbol">[]</span></div>
+				<aside class="tsd-sources">
+					<ul>
+						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/2d372dd/src/scheduler.class.ts#L59">scheduler.class.ts:59</a></li>
 					</ul>
 				</aside>
 			</section>
