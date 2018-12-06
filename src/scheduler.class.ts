@@ -187,7 +187,7 @@ export class UsScheduler {
    * @return             an iterator of labeled dates
    */
   public *generateCron(cronPattern: string): IterableIterator<DateTime> {
-    debug(`Generating cron "${cronPattern}" for`, this.now)
+    debug(`Initial Generating cron "${cronPattern}" for ${this.now.toISO()}`)
     let times = cronParser.parseExpression(cronPattern, {
       iterator: false,
       utc: false,
@@ -197,7 +197,7 @@ export class UsScheduler {
 
       const newDate: DateTime = yield DateTime.fromJSDate(times.next().toDate())
       if (newDate) {
-        debug(`Generating cron "${cronPattern}" for`, this.now)
+        debug(`Forced Generating cron "${cronPattern}" for ${newDate.toISO()}`)
         times = cronParser.parseExpression(cronPattern, {
           iterator: false,
           utc: false,
@@ -305,8 +305,9 @@ export class UsScheduler {
     }).pipe(
       expand((current, idx) => {
         const next = schedule.next().value
-        debug(`Croning from ${current.date.toISO()} to ${next.date.toISO()}`);
-        return of(next).pipe(delay(next.date.valueOf() - current.date.valueOf()))
+        const wait = next.date.diff(current.date);
+        debug(`Croning from ${current.date.toISO()} to ${next.date.toISO()} = ${wait.toFormat('d  hh:mm')}`);
+        return of(next).pipe(delay(wait.as('milliseconds')))
       }),
       skip(1),
 

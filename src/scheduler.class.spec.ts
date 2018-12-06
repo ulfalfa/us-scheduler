@@ -273,15 +273,15 @@ test('Scheduling', t => {
 
   // This test will actually run *synchronously*
   testScheduler.run(({ cold, expectObservable }) => {
-    const output = uss.schedule('13:00').pipe(
+    const output = uss.schedule('13:00', 'sunset').pipe(
       map(event => `${event.date.toISO()}-${event.index}`),
       take(3),
     );
 
-    expectObservable(output).toBe('3600000ms a 86399999ms b 86399999ms (c|)', {
+    expectObservable(output).toBe('3600000ms a 30865855ms b 55534143ms (c|)', {
       a: '2018-05-28T13:00:00.000+02:00-0',
-      b: '2018-05-29T13:00:00.000+02:00-0',
-      c: '2018-05-30T13:00:00.000+02:00-0'
+      b: '2018-05-28T21:34:25.856+02:00-1',
+      c: '2018-05-29T13:00:00.000+02:00-0'
     });
   });
 })

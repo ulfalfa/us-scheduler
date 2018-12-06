@@ -67,7 +67,7 @@
   "dependencies": {
     "cron-parser": "^2.5.0",
     "debug": "^4.1.0",
-    "luxon": "^1.2.1",
+    "luxon": "^1.8.2",
     "suncalc": "^1.8.0"
   },
   "peerDependencies": {
