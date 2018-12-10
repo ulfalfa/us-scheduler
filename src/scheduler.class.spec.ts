@@ -149,17 +149,18 @@ test('Generates a simple schedule', (t) => {
     customTimes: '6:30(wakeup)',
   });
   const schedule = uss.generateSchedule(['sunrise', 'wakeup', 'sunset']);
-  t.deepEqual(sampleEvents(schedule, 1000, 100),
-    ['0-2018-06-29T04:54:59.350+02:00',
-      '1-2018-08-01T06:30:00.000+02:00',
-      '2-2018-09-06T20:01:08.072+02:00',
-      '0-2018-11-12T07:41:12.572+01:00',
-      '1-2019-01-18T06:30:00.000+01:00',
-      '2-2019-03-21T18:34:47.242+01:00',
-      '0-2019-04-30T05:49:22.251+02:00',
-      '1-2019-06-02T06:30:00.000+02:00',
-      '2-2019-07-05T21:52:01.894+02:00',
-      '0-2019-08-08T05:47:49.314+02:00']);
+
+  t.deepEqual(sampleEvents(schedule, 100, 10),
+    ['2-2018-06-28T21:54:33.793+02:00',
+      '0-2018-07-02T04:57:04.484+02:00',
+      '1-2018-07-05T06:30:00.000+02:00',
+      '2-2018-07-08T21:49:54.261+02:00',
+      '0-2018-07-12T05:06:59.647+02:00',
+      '1-2018-07-15T06:30:00.000+02:00',
+      '2-2018-07-18T21:39:59.926+02:00',
+      '0-2018-07-22T05:20:31.739+02:00',
+      '1-2018-07-25T06:30:00.000+02:00',
+      '2-2018-07-28T21:25:40.107+02:00']);
 
 })
 
@@ -223,26 +224,7 @@ test('Generates a schedule with day change and weekly cron pattern', (t) => {
 })
 
 
-test('Generates a schedule with day change and weekly cron pattern', (t) => {
-  const uss = new UsScheduler({
-    latitude: 53.54,
-    longitude: 9.98,
-    customTimes: '6:30(wakeup)',
-    now: '2018-06-28T12:29:03.000+0200',
-  });
-  const schedule = uss.generateSchedule({
-    times: ['sunrise'], random: 0, dayCronPattern: '* * *'
-  });
 
-  t.deepEqual(sampleEvents(schedule, 8, 1), ['0-2018-06-29T04:54:59.350+02:00',
-    '0-2018-06-30T04:55:38.063+02:00',
-    '0-2018-07-01T04:56:19.794+02:00',
-    '0-2018-07-02T04:57:04.484+02:00',
-    '0-2018-07-03T04:57:52.073+02:00',
-    '0-2018-07-04T04:58:42.499+02:00',
-    '0-2018-07-05T04:59:35.695+02:00',
-    '0-2018-07-06T05:00:31.593+02:00']);
-})
 
 test('Generates a simple schedule with randomization', (t) => {
   const uss = new UsScheduler({
@@ -325,15 +307,15 @@ test('Scheduling with complex options', t => {
 
   // This test will actually run *synchronously*
   testScheduler.run(({ cold, expectObservable }) => {
-    const output = uss.schedule({ times: ['13:00'], random: 0, dayCronPattern: '* * *' }).pipe(
+    const output = uss.schedule({ times: ['08:00', '13:00'], random: 0, dayCronPattern: '* * *' }).pipe(
       map(event => `${event.date.toISO()}-${event.index}`),
       take(3),
     );
 
-    expectObservable(output).toBe('3600000ms a 86399999ms b 86399999ms (c|)', {
-      a: '2018-05-28T13:00:00.000+02:00-0',
-      b: '2018-05-29T13:00:00.000+02:00-0',
-      c: '2018-05-30T13:00:00.000+02:00-0'
+    expectObservable(output).toBe('3600000ms a 68399999ms b 17999999ms (c|)', {
+      a: '2018-05-28T13:00:00.000+02:00-1',
+      b: '2018-05-29T08:00:00.000+02:00-0',
+      c: '2018-05-29T13:00:00.000+02:00-1'
     });
   });
 })

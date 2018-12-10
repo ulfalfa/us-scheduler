@@ -247,7 +247,7 @@ export class UsScheduler {
 
     let date = cron.next().value;
     let dayTimes = this.getTimes(date);
-    let lastTarget = this.now;
+    let lastTarget = this.now.startOf('day');
 
     debug(`Starting schedule at ${date.toISO()} (last: ${lastTarget.toISO()}`)
     while (true) {
@@ -256,8 +256,8 @@ export class UsScheduler {
       for (let index = 0; index < options.times.length; index++) {
 
         const curEvent = options.times[index];
-        let target: DateTime;
-        target = resolveSimpleTime(curEvent, dayTimes);
+
+        let target = resolveSimpleTime(curEvent, dayTimes);
 
         if (options.random > 0) {
           const minutes = Math.floor(Math.random() * (2 * options.random + 1)) - options.random;
@@ -272,11 +272,15 @@ export class UsScheduler {
 
         debug(`Emitting ${target.toISO()}`)
 
-        yield {
-          date: target,
-          index,
-          definition: curEvent
+        if (target >= this.now) {
+          yield {
+            date: target,
+            index,
+            definition: curEvent
+          }
         }
+
+
         lastTarget = target;
       }
       date = cron.next(lastTarget).value;
