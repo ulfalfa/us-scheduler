@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.2.3"></a>
+## [1.2.3](https://github.com/ulfalfa/us-scheduler/compare/v1.2.2...v1.2.3) (2018-12-10)
+
+
+### Bug Fixes
+
+* **schedule:** start always at begin of day, but don't emit schedules beforen now ([33fbc5c](https://github.com/ulfalfa/us-scheduler/commit/33fbc5c))
+
+
+
 <a name="1.2.2"></a>
 ## [1.2.2](https://github.com/ulfalfa/us-scheduler/compare/v1.2.1...v1.2.2) (2018-12-06)
 
