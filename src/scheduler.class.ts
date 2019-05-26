@@ -115,11 +115,24 @@ export const TIME_PATTERN = /(\d\d):(\d\d)/
  * the main class for doing all the scheduling
  */
 export class UsScheduler {
-  protected _now: DateTime = null
-
   protected _customTimes: {
     [label: string]: ITime
   } = {}
+
+  protected _times: Times
+
+  get times(): Times {
+    return this._times
+  }
+
+  protected _now: DateTime = null
+  /**
+   * gets the current time (could be overriden by options)
+   * @return the current time
+   */
+  public get now(): DateTime {
+    return this._now ? this._now : DateTime.local()
+  }
 
   constructor(protected _opts: SchedulerOptions) {
     if (this._opts.now) {
@@ -128,13 +141,6 @@ export class UsScheduler {
     if (this._opts.customTimes) {
       this.setCustomTimes(...this._opts.customTimes.split(','))
     }
-  }
-  /**
-   * gets the current time (could be overriden by options)
-   * @return the current time
-   */
-  public get now(): DateTime {
-    return this._now ? this._now : DateTime.local()
   }
 
   /**
@@ -200,10 +206,7 @@ export class UsScheduler {
 
   resolve(time: TimeDefinition): any {
     const cTime: ComplexTime = isComplexTime(time) ? time : { time }
-    debug(cTime)
 
-    if (isComplexTime(time)) {
-    }
     if (curTimes[event]) {
       return curTimes[event]
     } else {
