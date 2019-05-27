@@ -11,21 +11,33 @@
     "build:main": "tsc -p src/tsconfig.main.json",
     "build:tests": "tsc -p src/tsconfig.spec.json",
     "lint": "tslint --project tsconfig.json --fix",
-    "unit": "nyc ava-ts -v src/**/*.spec.ts",
-    "watch": "ava-ts -w -v src/**/*.spec.ts",
+    "unit": "nyc ava -v",
+    "watch": "ava -w -v",
     "check-coverage": "nyc check-coverage",
     "html-coverage": "nyc report --reporter=html",
     "test": "yarn lint && yarn unit && yarn check-coverage",
     "cov": "yarn unit && yarn html-coverage && opn build/coverage/index.html",
     "docs": "yarn docs:html && opn build/docs/index.html",
-    "docs:html": "typedoc src/index.ts --excludePrivate --mode file --theme minimal --out build/docs",
+    "docs:html": "typedoc src/index.ts --excludePrivate --excludeNotExported --excludeProtected --mode file --theme minimal --out build/docs",
     "docs:publish": "yarn docs:html && gh-pages -d build/docs",
     "changelog": "standard-version",
     "release": "yarn reset && yarn test && yarn build && yarn docs:publish && yarn changelog",
     "reset": "git clean -dfx && git reset --hard && yarn"
   },
   "ava": {
-    "snapshotDir": "./build/snapshots"
+    "compileEnhancements": false,
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "sources": [
+      "src/**/*.ts"
+    ],
+    "files": [
+      "src/**/*.spec.ts"
+    ]
   },
   "nyc": {
     "exclude": [
@@ -50,8 +62,7 @@
   "devDependencies": {
     "@types/luxon": "^0.5.2",
     "@types/node": "^10.1.3",
-    "ava": "^0.25.0",
-    "ava-ts": "^0.24.5",
+    "ava": "^1.4.1",
     "cz-conventional-changelog": "^2.1.0",
     "gh-pages": "^1.1.0",
     "nyc": "^11.8.0",
@@ -60,18 +71,18 @@
     "standard-version": "^4.4.0",
     "trash-cli": "^1.4.0",
     "ts-node": "^6.0.5",
-    "tslint": "^5.10.0",
-    "typedoc": "^0.11.1",
+    "tslint": "^5.16.0",
+    "typedoc": "^0.14.2",
     "typescript": "^2.8.3"
   },
   "dependencies": {
-    "cron-parser": "^2.5.0",
+    "cron-parser": "^2.11.0",
     "debug": "^4.1.0",
     "luxon": "^1.8.2",
     "suncalc": "^1.8.0"
   },
   "peerDependencies": {
-    "rxjs": "^6.2.0"
+    "rxjs": "^6.x.0"
   },
   "config": {
     "commitizen": {
