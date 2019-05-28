@@ -1,6 +1,8 @@
 import { DateTime } from 'luxon'
 
 import * as cronParser from 'cron-parser'
+import { Observable, of } from 'rxjs'
+import { expand, delay, skip, map } from 'rxjs/operators'
 
 const debug = require('debug')('us-scheduler:cron')
 
@@ -35,4 +37,26 @@ export function* generateCron(
   while (true) {
     yield DateTime.fromJSDate(times.next().toDate())
   }
+}
+/**
+ * returns an observable cron stream
+ * @param  cronPattern a standard cron pattern
+ * @see {@link generateCron} for detailed pattern description
+ * @return             observable stream
+ *
+ */
+export function cron(cronPattern, start?: DateTime): Observable<DateTime> {
+  const cronsource = generateCron(cronPattern, start)
+  return of(start).pipe(
+    expand((curDate, idx) => {
+      const next = cronsource.next().value
+      debug(
+        `Croning from ${curDate.toISO()} to ${next.toISO()} = ${next
+          .diff(curDate)
+          .as('milliseconds') - 1}`
+      )
+      return of(next).pipe(delay(next.valueOf() - curDate.valueOf()))
+    }),
+    skip(1)
+  )
 }

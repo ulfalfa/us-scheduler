@@ -1,8 +1,10 @@
 import test from 'ava'
 
-import { generateCron } from './cron'
+import { generateCron, cron } from './cron'
 
 import { DateTime } from 'luxon'
+import { TestScheduler } from 'rxjs/testing'
+import { take } from 'rxjs/operators'
 
 test('Generates a cron with start', t => {
   let cron = generateCron(
@@ -57,4 +59,27 @@ test('Error handling with several cron pattern', t => {
   /*cron = generateCron('7 7 7 7 7 7 7', DateTime.fromISO('2018-06-28T12:00:00'))
   t.is(cron.next().value.toISO(), '2018-07-01T07:07:07.000+02:00')
   t.is(cron.next().value.toISO(), '2018-07-07T07:07:07.000+02:00')*/
+})
+
+test('cron scheduling', t => {
+  const testScheduler = new TestScheduler((actual, expected) => {
+    t.deepEqual(actual, expected)
+  })
+
+  // This test will actually run *synchronously*
+  testScheduler.run(({ cold, expectObservable }) => {
+    const output = cron(
+      '56 34 12 15 * *',
+      DateTime.fromISO('2018-05-28T12:00:00.000+02:00')
+    ).pipe(take(3))
+
+    expectObservable(output).toBe(
+      '1557296000ms a 2591999999ms b 2678399999ms (c|)',
+      {
+        a: DateTime.fromISO('2018-06-15T12:34:56.000+02:00'),
+        b: DateTime.fromISO('2018-07-15T12:34:56.000+02:00'),
+        c: DateTime.fromISO('2018-08-15T12:34:56.000+02:00'),
+      }
+    )
+  })
 })
