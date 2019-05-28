@@ -942,6 +942,9 @@ img { max-width: 100%; }
 		<li class=" tsd-kind-type-alias tsd-is-external">
 			<a href="globals.html#timedefinition" class="tsd-kind-icon">Time<wbr>Definition</a>
 		</li>
+		<li class=" tsd-kind-function tsd-is-external">
+			<a href="globals.html#cron" class="tsd-kind-icon">cron</a>
+		</li>
 		<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
 			<a href="globals.html#doat" class="tsd-kind-icon">do<wbr>At</a>
 		</li>
@@ -999,6 +1002,7 @@ img { max-width: 100%; }
 					<section class="tsd-index-section tsd-is-external">
 						<h3>Functions</h3>
 						<ul class="tsd-index-list">
+							<li class="tsd-kind-function tsd-is-external"><a href="globals.html#cron" class="tsd-kind-icon">cron</a></li>
 							<li class="tsd-kind-function tsd-has-type-parameter tsd-is-external"><a href="globals.html#doat" class="tsd-kind-icon">do<wbr>At</a></li>
 							<li class="tsd-kind-function tsd-has-type-parameter tsd-is-external"><a href="globals.html#doin" class="tsd-kind-icon">do<wbr>In</a></li>
 							<li class="tsd-kind-function tsd-is-external"><a href="globals.html#generatecron" class="tsd-kind-icon">generate<wbr>Cron</a></li>
@@ -1017,7 +1021,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">Simple<wbr>Time<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/714346c/src/scheduler.ts#L72">scheduler.ts:72</a></li>
+						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/7f9828f/src/scheduler.ts#L72">scheduler.ts:72</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1027,13 +1031,53 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">Time<wbr>Definition<span class="tsd-signature-symbol">:</span> <a href="globals.html#simpletime" class="tsd-signature-type">SimpleTime</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/complextime.html" class="tsd-signature-type">ComplexTime</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/mintimes.html" class="tsd-signature-type">MinTimes</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/maxtimes.html" class="tsd-signature-type">MaxTimes</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/714346c/src/scheduler.ts#L73">scheduler.ts:73</a></li>
+						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/7f9828f/src/scheduler.ts#L73">scheduler.ts:73</a></li>
 					</ul>
 				</aside>
 			</section>
 		</section>
 		<section class="tsd-panel-group tsd-member-group tsd-is-external">
 			<h2>Functions</h2>
+			<section class="tsd-panel tsd-member tsd-kind-function tsd-is-external">
+				<a name="cron" class="tsd-anchor"></a>
+				<h3>cron</h3>
+				<ul class="tsd-signatures tsd-kind-function tsd-is-external">
+					<li class="tsd-signature tsd-kind-icon">cron<span class="tsd-signature-symbol">(</span>cronPattern<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, start<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">DateTime</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">DateTime</span><span class="tsd-signature-symbol">&gt;</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/7f9828f/src/cron.ts#L48">cron.ts:48</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>returns an observable cron stream</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="globals.html#generatecron">generateCron</a> for detailed pattern description</p>
+								</dd>
+							</dl>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>cronPattern: <span class="tsd-signature-type">any</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>a standard cron pattern</p>
+								</div>
+							</li>
+							<li>
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> start: <span class="tsd-signature-type">DateTime</span></h5>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">DateTime</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						<p>observable stream</p>
+					</li>
+				</ul>
+			</section>
 			<section class="tsd-panel tsd-member tsd-kind-function tsd-has-type-parameter tsd-is-external">
 				<a name="doat" class="tsd-anchor"></a>
 				<h3>do<wbr>At</h3>
@@ -1044,7 +1088,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/714346c/src/scheduler.ts#L35">scheduler.ts:35</a></li>
+								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/7f9828f/src/scheduler.ts#L35">scheduler.ts:35</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1093,7 +1137,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/714346c/src/scheduler.ts#L18">scheduler.ts:18</a></li>
+								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/7f9828f/src/scheduler.ts#L18">scheduler.ts:18</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1134,7 +1178,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/714346c/src/cron.ts#L24">cron.ts:24</a></li>
+								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/7f9828f/src/cron.ts#L26">cron.ts:26</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1180,7 +1224,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/714346c/src/scheduler.ts#L98">scheduler.ts:98</a></li>
+								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/7f9828f/src/scheduler.ts#L98">scheduler.ts:98</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1206,7 +1250,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/714346c/src/scheduler.ts#L179">scheduler.ts:179</a></li>
+								<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/7f9828f/src/scheduler.ts#L179">scheduler.ts:179</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-parameters-title">Parameters</h4>
