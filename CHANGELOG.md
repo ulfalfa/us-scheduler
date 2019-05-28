@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.1.0"></a>
+# [2.1.0](https://github.com/ulfalfa/us-scheduler/compare/v2.0.0...v2.1.0) (2019-05-28)
+
+
+### Features
+
+* **cron:** new function for generate a cron observable with schedule ([7f9828f](https://github.com/ulfalfa/us-scheduler/commit/7f9828f))
+* **cron:** new function for generate a cron observable with schedule ([d340edd](https://github.com/ulfalfa/us-scheduler/commit/d340edd))
+
+
+
 <a name="2.0.0"></a>
 # [2.0.0](https://github.com/ulfalfa/us-scheduler/compare/v1.2.3...v2.0.0) (2019-05-27)
 
