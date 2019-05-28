@@ -4,6 +4,8 @@ import { SunTimes } from './suntimes'
 
 import { DateTime } from 'luxon'
 
+import * as SunCalc from 'suncalc'
+
 interface Context {
   st: SunTimes
   st_winter: SunTimes
@@ -124,4 +126,23 @@ test('Get min and max times ', t => {
   time = t.context.st.min(['goldenHour', '21:00'])
 
   t.is(time.toISO(), '2018-06-28T20:56:31.674+02:00')
+})
+
+test('Get sunposition', t => {
+  t.deepEqual(t.context.st.sun, {
+    altitude: -0.2270578274050683,
+    azimuth: 3.0523994324598287,
+    date: DateTime.fromISO('2018-06-28T01:02:03.000+02:00'),
+  })
+
+  const st = new SunTimes({
+    latitude: 53.54,
+    longitude: 9.98,
+  })
+
+  const pos = st.sun
+  t.is(
+    pos.altitude,
+    SunCalc.getPosition(pos.date.toJSDate(), 53.54, 9.98).altitude
+  )
 })

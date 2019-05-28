@@ -29,6 +29,12 @@ export interface SunTimesOptions {
   now?: DateTime
 }
 
+export interface SunPosition {
+  altitude: number
+  azimuth: number
+  date: DateTime
+}
+
 export class SunTimes {
   protected _times: Times
   get times(): Times {
@@ -36,12 +42,24 @@ export class SunTimes {
   }
 
   set now(now: DateTime) {
-    const start = now ? now : DateTime.local()
+    const start = now ? now.plus(0) : DateTime.local()
     this._times = this.calcTimes(start)
   }
 
   get now(): DateTime {
     return this._times[START_LABEL]
+  }
+
+  get sun(): SunPosition {
+    const now = this.options.now || DateTime.local()
+    debug('getting sun for', now.toISO())
+    const result = Suncalc.getPosition(
+      now.toJSDate(),
+      this.options.latitude,
+      this.options.longitude
+    )
+    result.date = now
+    return result
   }
 
   constructor(
