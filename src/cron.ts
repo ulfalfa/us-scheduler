@@ -47,6 +47,7 @@ export function* generateCron(
  */
 export function cron(cronPattern, start?: DateTime): Observable<DateTime> {
   const cronsource = generateCron(cronPattern, start)
+  start = start ? start : DateTime.local()
   return of(start).pipe(
     expand((curDate, idx) => {
       const next = cronsource.next().value
