@@ -910,22 +910,28 @@ img { max-width: 100%; }
 <nav class="tsd-navigation secondary">
 	<ul>
 		<li class=" tsd-kind-class tsd-is-external">
+			<a href="../classes/scheduler.html" class="tsd-kind-icon">Scheduler</a>
+		</li>
+		<li class=" tsd-kind-class tsd-is-external">
 			<a href="../classes/suntimes.html" class="tsd-kind-icon">Sun<wbr>Times</a>
 		</li>
-		<li class=" tsd-kind-interface tsd-is-external">
-			<a href="complextime.html" class="tsd-kind-icon">Complex<wbr>Time</a>
+		<li class=" tsd-kind-interface tsd-has-type-parameter tsd-is-external">
+			<a href="calculatedtime.html" class="tsd-kind-icon">Calculated<wbr>Time</a>
 		</li>
-		<li class=" tsd-kind-interface tsd-is-external">
+		<li class=" tsd-kind-interface tsd-has-type-parameter tsd-is-external">
 			<a href="maxtimes.html" class="tsd-kind-icon">Max<wbr>Times</a>
 		</li>
-		<li class=" tsd-kind-interface tsd-is-external">
+		<li class=" tsd-kind-interface tsd-has-type-parameter tsd-is-external">
 			<a href="mintimes.html" class="tsd-kind-icon">Min<wbr>Times</a>
 		</li>
-		<li class=" tsd-kind-interface tsd-is-external">
+		<li class=" tsd-kind-interface tsd-has-type-parameter tsd-is-external">
 			<a href="scheduleevent.html" class="tsd-kind-icon">Schedule<wbr>Event</a>
 		</li>
 		<li class=" tsd-kind-interface tsd-is-external">
-			<a href="scheduleoptions.html" class="tsd-kind-icon">Schedule<wbr>Options</a>
+			<a href="scheduleroptions.html" class="tsd-kind-icon">Scheduler<wbr>Options</a>
+		</li>
+		<li class=" tsd-kind-interface tsd-has-type-parameter tsd-is-external">
+			<a href="singletime.html" class="tsd-kind-icon">Single<wbr>Time</a>
 		</li>
 		<li class="current tsd-kind-interface tsd-is-external">
 			<a href="sunposition.html" class="tsd-kind-icon">Sun<wbr>Position</a>
@@ -944,8 +950,8 @@ img { max-width: 100%; }
 		<li class=" tsd-kind-interface tsd-is-external">
 			<a href="suntimesoptions.html" class="tsd-kind-icon">Sun<wbr>Times<wbr>Options</a>
 		</li>
-		<li class=" tsd-kind-interface tsd-is-external">
-			<a href="timealteration.html" class="tsd-kind-icon">Time<wbr>Alteration</a>
+		<li class=" tsd-kind-interface tsd-has-type-parameter tsd-is-external">
+			<a href="timebase.html" class="tsd-kind-icon">Time<wbr>Base</a>
 		</li>
 		<li class=" tsd-kind-interface tsd-is-external">
 			<a href="times.html" class="tsd-kind-icon">Times</a>
@@ -953,31 +959,26 @@ img { max-width: 100%; }
 		<li class=" tsd-kind-type-alias tsd-is-external">
 			<a href="../globals.html#simpletime" class="tsd-kind-icon">Simple<wbr>Time</a>
 		</li>
-		<li class=" tsd-kind-type-alias tsd-is-external">
+		<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
 			<a href="../globals.html#timedefinition" class="tsd-kind-icon">Time<wbr>Definition</a>
 		</li>
 		<li class=" tsd-kind-function tsd-is-external">
 			<a href="../globals.html#cron" class="tsd-kind-icon">cron</a>
 		</li>
-		<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
-			<a href="../globals.html#doat" class="tsd-kind-icon">do<wbr>At</a>
-		</li>
-		<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
-			<a href="../globals.html#doin" class="tsd-kind-icon">do<wbr>In</a>
-		</li>
 		<li class=" tsd-kind-function tsd-is-external">
 			<a href="../globals.html#generatecron" class="tsd-kind-icon">generate<wbr>Cron</a>
-		</li>
-		<li class=" tsd-kind-function tsd-is-external">
-			<a href="../globals.html#generateschedule" class="tsd-kind-icon">generate<wbr>Schedule</a>
-		</li>
-		<li class=" tsd-kind-function tsd-is-external">
-			<a href="../globals.html#schedule" class="tsd-kind-icon">schedule</a>
 		</li>
 	</ul>
 </nav>
 <div class="container container-main">
 	<div class="content-wrap">
+		<section class="tsd-panel tsd-comment">
+			<div class="tsd-comment tsd-typography">
+				<div class="lead">
+					<p>a caluculated sunposition for a datetime</p>
+				</div>
+			</div>
+		</section>
 		<section class="tsd-panel tsd-hierarchy">
 			<h3>Hierarchy</h3>
 			<ul class="tsd-hierarchy">
@@ -1009,7 +1010,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">altitude<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/ce671fb/src/suntimes.ts#L33">suntimes.ts:33</a></li>
+						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/5f9f94e/src/models.ts#L91">models.ts:91</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1019,7 +1020,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">azimuth<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/ce671fb/src/suntimes.ts#L34">suntimes.ts:34</a></li>
+						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/5f9f94e/src/models.ts#L94">models.ts:94</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1029,7 +1030,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">date<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">DateTime</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/ce671fb/src/suntimes.ts#L35">suntimes.ts:35</a></li>
+						<li>Defined in <a href="https://github.com/ulfalfa/us-scheduler/blob/5f9f94e/src/models.ts#L95">models.ts:95</a></li>
 					</ul>
 				</aside>
 			</section>
