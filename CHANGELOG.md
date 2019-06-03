@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.0.0"></a>
+# [3.0.0](https://github.com/ulfalfa/us-scheduler/compare/v2.2.0...v3.0.0) (2019-06-03)
+
+
+### Bug Fixes
+
+* **cron:** default starttime ([d289507](https://github.com/ulfalfa/us-scheduler/commit/d289507))
+
+
+### Features
+
+* again a rewrite to a more practical approach ([5f9f94e](https://github.com/ulfalfa/us-scheduler/commit/5f9f94e))
+
+
+### BREAKING CHANGES
+
+* complete restructure with a new interface
+
+
+
 <a name="2.2.0"></a>
 # [2.2.0](https://github.com/ulfalfa/us-scheduler/compare/v2.1.1...v2.2.0) (2019-05-28)
 
