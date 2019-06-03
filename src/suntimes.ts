@@ -1,44 +1,63 @@
 import * as Suncalc from 'suncalc'
 
-import { DateTime } from 'luxon'
+import { DateTime, Duration } from 'luxon'
+import {
+  TimeBase,
+  SunTimesOptions,
+  TimeDefinition,
+  SimpleTime,
+  SingleTime,
+  MinTimes,
+  MaxTimes,
+  SunPosition,
+  CalculatedTime,
+} from './models'
+import { open } from 'fs'
+import { timestamp, map } from 'rxjs/operators'
+import { timer, of, Observable } from 'rxjs'
 
 const debug = require('debug')('us-scheduler:suntimes')
 
-const START_LABEL = '_start_'
+const START_LABEL = 'midnight'
 export interface Times {
-  _start_: DateTime
+  midnight: DateTime
   [name: string]: DateTime
 }
 
-const TIME_PATTERN = /(\d\d):(\d\d)/
+const TIME_PATTERN = /^(\d\d):(\d\d)$/
 
-export interface TimeAlteration {
-  random?: number
-  offset?: number
+function isSimpleTime<T>(val: TimeDefinition<T>): val is SimpleTime {
+  return typeof val === 'string'
 }
-
-/**
- * options for creating a suntimes object
- */
-export interface SunTimesOptions {
-  /** latitude for sun calculations */
-  latitude: number
-  /** longitude for sun calculations */
-  longitude: number
-  /** optional startTime used as starting point in luxon DateTime format */
-  now?: DateTime
+function isSingleTime<T>(val: TimeDefinition<T>): val is SingleTime<T> {
+  return typeof val !== 'string' && val.hasOwnProperty('time')
 }
-
-export interface SunPosition {
-  altitude: number
-  azimuth: number
-  date: DateTime
+function isMinTimes<T>(val: TimeDefinition<T>): val is MinTimes<T> {
+  return (
+    val.hasOwnProperty('min') &&
+    Array.isArray((val as MinTimes).min) &&
+    (val as MinTimes).min.length > 0
+  )
+}
+function isMaxTimes<T>(val: TimeDefinition<T>): val is MaxTimes<T> {
+  return (
+    val.hasOwnProperty('max') &&
+    Array.isArray((val as MaxTimes).max) &&
+    (val as MaxTimes).max.length > 0
+  )
 }
 
 export class SunTimes {
   protected _times: Times
   get times(): Times {
     return this._times
+  }
+
+  get sortedTimes(): { label: string; time: string }[] {
+    return Object.keys(this.times)
+      .map(label => ({ label, time: this.times[label] }))
+      .sort((a, b) => a.time.valueOf() - b.time.valueOf())
+      .map(({ label, time }) => ({ label, time: time.toISO() }))
   }
 
   set now(now: DateTime) {
@@ -51,15 +70,7 @@ export class SunTimes {
   }
 
   get sun(): SunPosition {
-    const now = this.options.now || DateTime.local()
-    debug('getting sun for', now.toISO())
-    const result = Suncalc.getPosition(
-      now.toJSDate(),
-      this.options.latitude,
-      this.options.longitude
-    )
-    result.date = now
-    return result
+    return this.calcSun(this.options.now)
   }
 
   constructor(
@@ -68,11 +79,25 @@ export class SunTimes {
     this.now = options.now
   }
 
-  protected calcTimes(startTime: DateTime): Times {
+  calcSun(date: DateTime = DateTime.local()): SunPosition {
+    const result = Suncalc.getPosition(
+      date.toJSDate(),
+      this.options.latitude,
+      this.options.longitude
+    )
+
+    return {
+      altitude: result.altitude * (90 / Math.PI),
+      azimuth: result.azimuth * (180 / Math.PI) + 180,
+      date,
+    }
+  }
+
+  calcTimes(startTime: DateTime = DateTime.local()): Times {
     const sctimes = Suncalc.getTimes(
       startTime
         .startOf('day')
-        .toUTC(0, { keepLocalTime: true })
+        .toUTC(2, { keepLocalTime: true })
         .toJSDate(),
       this.options.latitude,
       this.options.longitude
@@ -87,13 +112,17 @@ export class SunTimes {
 
         return times
       },
-      { _start_: startTime.startOf('day') }
+      { midnight: startTime.startOf('day') }
     )
 
     return resTimes
   }
 
-  get(time: string, options?: TimeAlteration): DateTime {
+  /**
+   * gets a the datetime of a input string according to the current calculated sun times
+   * @param time a string definition (either astro time or string HH24:MM)
+   */
+  get<T>(time: SimpleTime): DateTime {
     let result: DateTime
     if (this._times[time]) {
       result = this._times[time]
@@ -106,38 +135,107 @@ export class SunTimes {
           minute: parseInt(min, 10),
         })
       } else {
-        throw new Error(
-          `${time} is neither predefined nor a valid time (HH:mm)`
-        )
+        result = DateTime.fromISO(time)
+        if (!result.isValid) {
+          throw new Error(
+            `'${time}' is neither predefined nor a valid time (HH:mm) - ${
+              result.invalidReason
+            }`
+          )
+        }
+      }
+    }
+    return result
+  }
+
+  parse<T>(definition: TimeDefinition<T>): CalculatedTime<T> {
+    if (isSimpleTime(definition)) {
+      definition = {
+        time: definition,
+        offset: 0,
+        random: 0,
+        data: undefined,
       }
     }
 
-    return this.alterTime(result, options)
+    let result: CalculatedTime<T>
+
+    if (isSingleTime(definition)) {
+      result = this.resolveSimple(definition)
+    } else if (isMinTimes(definition)) {
+      result = this.resolveMin(definition)
+    } else if (isMaxTimes(definition)) {
+      result = this.resolveMax(definition)
+    } else {
+      throw new Error(
+        `time definition (${JSON.stringify(definition)}) not valid`
+      )
+    }
+
+    return this.alterTime(result)
   }
 
-  protected alterTime(
-    time: DateTime,
-    options: TimeAlteration = { random: 0, offset: 0 }
-  ) {
-    if (options.random > 0) {
+  protected alterTime<T>(input: CalculatedTime<T>): CalculatedTime<T> {
+    if (input.random && input.random > 0) {
       const minutes =
-        Math.floor(Math.random() * (2 * options.random + 1)) - options.random
-      time = time.plus({ minutes })
+        Math.floor(Math.random() * (2 * input.random + 1)) - input.random
+      input.target = input.target.plus({ minutes })
+      input.random = minutes
+    } else {
+      input.random = 0
     }
-    if (options.offset !== 0) {
-      time = time.plus({ minutes: options.offset })
+
+    if (input.offset && input.offset !== 0) {
+      input.target = input.target.plus({ minutes: input.offset })
+    } else {
+      input.offset = 0
     }
-    return time
+    return input
   }
 
-  min(times: string[], options?: TimeAlteration): DateTime {
-    const result = DateTime.min(...times.map(time => this.get(time)))
-
-    return this.alterTime(result, options)
+  protected resolveSimple<T>(input: SingleTime<T>): CalculatedTime<T> {
+    return {
+      target: this.get(input.time),
+      offset: input.offset,
+      random: input.random,
+      label: input.time,
+      data: input.data,
+    }
   }
-  max(times: string[], options?: TimeAlteration): DateTime {
-    const result = DateTime.max(...times.map(time => this.get(time)))
 
-    return this.alterTime(result, options)
+  protected resolveMin<T>(times: MinTimes<T>): CalculatedTime<T> {
+    // convert to ms since epoque
+    let idx = 0
+    const resolvedTimes = times.min.map(simpleTime => this.get(simpleTime))
+
+    resolvedTimes.forEach(
+      (value, curidx, all) => (idx = value < all[idx] ? curidx : idx)
+    )
+
+    return {
+      target: resolvedTimes[idx],
+      label: times.min[idx],
+      offset: times.offset,
+      random: times.random,
+      data: times.data,
+    }
+  }
+
+  protected resolveMax<T>(times: MaxTimes<T>): CalculatedTime<T> {
+    // convert to ms since epoque
+    let idx = 0
+    const resolvedTimes = times.max.map(simpleTime => this.get(simpleTime))
+
+    resolvedTimes.forEach(
+      (value, curidx, all) => (idx = value > all[idx] ? curidx : idx)
+    )
+
+    return this.alterTime({
+      target: resolvedTimes[idx],
+      label: times.max[idx],
+      offset: times.offset,
+      random: times.random,
+      data: times.data,
+    })
   }
 }

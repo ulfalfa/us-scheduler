@@ -3,208 +3,134 @@ import { Observable, timer, of } from 'rxjs'
 import { map, expand, delay, skip } from 'rxjs/operators'
 import { generateCron } from './cron'
 import { SunTimes } from './suntimes'
+import {
+  SchedulerOptions,
+  TimeDefinition,
+  ScheduleEvent,
+  CalculatedTime,
+  SunTimesOptions,
+} from './models'
 
 const debug = require('debug')('us-scheduler:scheduler')
 
-function startDefault(start: DateTime) {
-  return start ? start : DateTime.local()
-}
+export class Scheduler {
+  get now(): DateTime {
+    return this.options.now || DateTime.local()
+  }
+  constructor(protected options: SchedulerOptions) {
+    options.dayCronPattern = options.dayCronPattern || '* * *'
+    /* istanbul ignore next */
 
-/**
- * emits after a specified duration
- * @param  duration either a duration in ISO8601 (without the P) or seconds
- * @return          observable, that fires after duration is over;
- */
-export function doIn<T>(duration: string | number, data?: T): Observable<T> {
-  let d: Duration
-  if (typeof duration === 'string') {
-    d = Duration.fromISO('PT' + duration.toUpperCase())
-  } else {
-    d = Duration.fromISO('PT' + duration.toString() + 'S')
+    options.skipPast =
+      typeof options.skipPast === 'undefined' ? false : options.skipPast
   }
 
-  return timer(d.as('milliseconds')).pipe(map(() => data))
-}
+  getSuntimes(): SunTimes {
+    return new SunTimes({ ...(this.options as SunTimesOptions) })
+  }
 
-/**
- * Emits at a given datetime
- * @param date the date to emit
- * @param data the data to emit
- * @param from optional start date (mainly for testing purposes)
- */
-export function doAt<T>(
-  date: DateTime,
-  data?: T,
-  from?: DateTime
-): Observable<T> {
-  const ms = date.valueOf() - startDefault(from).valueOf()
+  *generateSchedule<T>(
+    ...times: TimeDefinition<T>[]
+  ): IterableIterator<ScheduleEvent<T>> {
+    debug(`Starting at ${this.now.toISO()}`)
+    const cron = generateCron(
+      '59 59 23 ' + this.options.dayCronPattern,
+      this.now
+    )
 
-  return ms > 0 ? timer(ms).pipe(map(() => data)) : of(data)
-}
-
-export interface ScheduleOptions {
-  /** latitude for sun calculations */
-  latitude: number
-  /** longitude for sun calculations */
-  longitude: number
-  dayCronPattern?: string
-  /** optional startTime used a now in ISO Format(mainly for testing purposes) */
-  now?: string
-  skipPast?: boolean
-  skipStart?: boolean
-  random?: number // a randomizing factor in minutes
-  offset?: number // a potential offset in minutes
-}
-export interface ComplexTime {
-  time: SimpleTime // time can be either a labeled time (eg. dusk or midnight) or a string in format hh24:mm
-  random?: number // a randomizing factor in minutes
-  offset?: number // a potential offset in minutes
-  data?: any // data to emit
-}
-
-export interface MinTimes {
-  min: SimpleTime[] // time can be either a labeled time (eg. dusk or midnight) or a string in format hh24:mm
-}
-export interface MaxTimes {
-  max: SimpleTime[] // time can be either a labeled time (eg. dusk or midnight) or a string in format hh24:mm
-}
-
-export type SimpleTime = string
-export type TimeDefinition = SimpleTime | ComplexTime | MinTimes | MaxTimes
-
-function isSimpleTime(val: TimeDefinition): val is SimpleTime {
-  return typeof val === 'string'
-}
-function isComplexTime(val: TimeDefinition): val is ComplexTime {
-  return typeof val !== 'string' && val.hasOwnProperty('time')
-}
-function isMinTime(val: TimeDefinition): val is MinTimes {
-  return val.hasOwnProperty('min') && Array.isArray((val as MinTimes).min)
-}
-function isMaxTime(val: TimeDefinition): val is MaxTimes {
-  return val.hasOwnProperty('max') && Array.isArray((val as MaxTimes).max)
-}
-function isScheduleOptions(val: any): val is MinTimes {
-  return val.hasOwnProperty('latitude') && val.hasOwnProperty('longitude')
-}
-
-export interface ScheduleEvent {
-  index: number
-  target: DateTime
-  definition?: TimeDefinition
-  data?: any
-}
-
-export function* generateSchedule(
-  times: TimeDefinition[],
-  options: ScheduleOptions
-): IterableIterator<ScheduleEvent> {
-  options.dayCronPattern = options.dayCronPattern || '* * *'
-
-  /* istanbul ignore next */
-  const start = options.now ? DateTime.fromISO(options.now) : DateTime.local()
-  options.offset = options.offset || 0
-  options.random = options.random || 0
-  options.skipPast =
-    typeof options.skipPast === 'undefined' ? false : options.skipPast
-
-  const cron = generateCron('59 59 23 ' + options.dayCronPattern, start)
-
-  // getting the current date for cron (is end of day, to allow dates in the past)
-  let now = cron.next().value
-  debug(`Starting at ${start.toISO()}`)
-  while (true) {
-    // calculate suntimes for today
-    let st = new SunTimes({
-      longitude: options.longitude,
-      latitude: options.latitude,
+    // getting the current date for cron (is end of day, to allow dates in the past)
+    let now = cron.next().value
+    const st = new SunTimes({
+      longitude: this.options.longitude,
+      latitude: this.options.latitude,
       now,
     })
-    let lastTarget = st.now.minus({ seconds: 1 })
 
-    for (let index = 0; index < times.length; index++) {
-      let target: DateTime
-      const definition = times[index]
-      /* istanbul ignore next */
-      if (isComplexTime(definition)) {
-        target = st.get(definition.time, {
-          random: definition.random || options.random,
-          offset: definition.offset || options.offset,
-        })
-      } else if (isSimpleTime(definition)) {
-        target = st.get(definition, {
-          random: options.random,
-          offset: options.offset,
-        })
-      } else if (isMinTime(definition)) {
-        target = st.min(definition.min, {
-          random: options.random,
-          offset: options.offset,
-        })
-      } else if (isMaxTime(definition)) {
-        target = st.max(definition.max, {
-          random: options.random,
-          offset: options.offset,
-        })
-      } else {
-        throw new Error('time definition not known')
-      }
-      if (target <= lastTarget) {
-        target = target.plus({ days: 1 })
-        st = new SunTimes({
-          longitude: options.longitude,
-          latitude: options.latitude,
-          now: target,
-        })
-      }
-      // debug('Yield', index, target.toISO());
-      if (target > start || !options.skipPast) {
-        yield {
-          index,
-          target,
-          definition,
-          data: (definition as ComplexTime).data,
+    if (times.length === 0) {
+      times = st.sortedTimes.map(time => time.label)
+    }
+
+    while (true) {
+      let lastTarget = st.now.minus({ seconds: 1 })
+
+      for (let index = 0; index < times.length; index++) {
+        const target = st.parse(times[index])
+
+        if (target.target <= lastTarget) {
+          target.target = target.target.plus({ days: 1 })
+          st.now = target.target
         }
-        lastTarget = target
+
+        debug(`${target.target.toISO()} compared to ${this.now.toISO()}  `)
+        if (target.target > this.now || !this.options.skipPast) {
+          debug('YIELD')
+          yield {
+            index,
+            ...target,
+          }
+          lastTarget = target.target
+        }
       }
-    }
-    now = cron.next().value
-    while (now < lastTarget.endOf('day')) {
       now = cron.next().value
-      debug(`   check ${now.toISO()}`)
+      while (now < lastTarget.endOf('day')) {
+        now = cron.next().value
+        debug(`   check ${now.toISO()}`)
+      }
+      st.now = now
     }
   }
-}
 
-export function schedule(
-  ...times: (TimeDefinition | ScheduleOptions)[]
-): Observable<ScheduleEvent> {
-  if (times.length === 0 || !isScheduleOptions(times[times.length - 1])) {
-    throw new Error('last parameter must be scheduling options')
+  schedule<T>(...times: TimeDefinition<T>[]): Observable<ScheduleEvent<T>> {
+    const aSchedule = this.generateSchedule(...times)
+
+    const result = of<ScheduleEvent<T>>({
+      target: this.now,
+      index: -1,
+      label: '__START__',
+      offset: 0,
+      random: 0,
+    }).pipe(
+      expand(current => {
+        const next = aSchedule.next().value
+        const waitMs = next.target.valueOf() - current.target.valueOf()
+        debug(
+          `Croning from ${current.target.toISO()} to ${next.target.toISO()} = ${waitMs -
+            1} ms`
+        )
+        return of(next).pipe(delay(waitMs > 0 ? waitMs : 0))
+      })
+    )
+
+    return result.pipe(skip(1))
   }
-  if (times.length < 2) {
-    throw new Error('at least on time must be specified')
+
+  /**
+   * Emits at a given time definition
+   * @param definition the time to emit
+   * @param from optional start date (mainly for testing purposes)
+   */
+
+  at<T>(definition: TimeDefinition<T>): Observable<CalculatedTime<T>> {
+    const st = new SunTimes(this.options)
+    const result = st.parse(definition)
+    const ms = result.target.valueOf() - this.now.valueOf()
+    debug(`Do at ${result.target.toISO()} means in '${ms}ms'`)
+    return ms > 0 ? timer(ms).pipe(map(() => result)) : of(result)
   }
-  const options = times.pop() as ScheduleOptions
-  options.skipStart =
-    typeof options.skipStart === 'undefined' ? true : options.skipStart
 
-  const aSchedule = generateSchedule(times as TimeDefinition[], options)
+  /**
+   * emits after a specified duration
+   * @param  duration either a duration in ISO8601 or seconds
+   * @return          observable, that fires after duration is over;
+   */
+  in<T>(duration: string | number, data?: T): Observable<T> {
+    let d: Duration
+    if (typeof duration === 'string') {
+      d = Duration.fromISO(duration.toUpperCase())
+    } else {
+      d = Duration.fromISO('PT' + duration.toString() + 'S')
+    }
 
-  const result = of<ScheduleEvent>({
-    target: DateTime.fromISO(options.now),
-    index: -1,
-  }).pipe(
-    expand(current => {
-      const next = aSchedule.next().value
-      const waitMs = next.target.valueOf() - current.target.valueOf()
-      debug(
-        `Croning from ${current.target.toISO()} to ${next.target.toISO()} = ${waitMs -
-          1} ms`
-      )
-      return of(next).pipe(delay(waitMs > 0 ? waitMs : 0))
-    })
-  )
-
-  return options.skipStart ? result.pipe(skip(1)) : result
+    return timer(d.as('milliseconds')).pipe(map(() => data))
+  }
 }

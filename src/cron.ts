@@ -25,15 +25,15 @@ const debug = require('debug')('us-scheduler:cron')
  */
 export function* generateCron(
   cronPattern: string,
-  start?: DateTime
+  start: DateTime = DateTime.local()
 ): IterableIterator<DateTime> {
-  start = start ? start : DateTime.local()
   debug(`Generating cron "${cronPattern}" for ${start.toISO()}`)
   const times = cronParser.parseExpression(cronPattern, {
     iterator: false,
     utc: false,
     currentDate: start.toLocal().toJSDate(),
   })
+  yield start
   while (true) {
     yield DateTime.fromJSDate(times.next().toDate())
   }
@@ -45,10 +45,10 @@ export function* generateCron(
  * @return             observable stream
  *
  */
-export function cron(cronPattern, start?: DateTime): Observable<DateTime> {
+export function cron(cronPattern, start: DateTime): Observable<DateTime> {
   const cronsource = generateCron(cronPattern, start)
-  start = start ? start : DateTime.local()
-  return of(start).pipe(
+
+  return of(cronsource.next().value).pipe(
     expand((curDate, idx) => {
       const next = cronsource.next().value
       debug(

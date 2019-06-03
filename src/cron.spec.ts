@@ -11,6 +11,7 @@ test('Generates a cron with start', t => {
     '0 30 12 * * *',
     DateTime.fromISO('2018-06-28T12:00:00')
   )
+  t.is(myCron.next().value.toISO(), '2018-06-28T12:00:00.000+02:00')
   t.is(myCron.next().value.toISO(), '2018-06-28T12:30:00.000+02:00')
   t.is(myCron.next().value.toISO(), '2018-06-29T12:30:00.000+02:00')
   t.is(myCron.next().value.toISO(), '2018-06-30T12:30:00.000+02:00')
@@ -19,6 +20,7 @@ test('Generates a cron with start', t => {
     '0 30 12 * * *',
     DateTime.fromISO('2018-06-28T13:00:00')
   )
+  t.is(myCron.next().value.toISO(), '2018-06-28T13:00:00.000+02:00')
   t.is(myCron.next().value.toISO(), '2018-06-29T12:30:00.000+02:00')
   t.is(myCron.next().value.toISO(), '2018-06-30T12:30:00.000+02:00')
   t.is(myCron.next().value.toISO(), '2018-07-01T12:30:00.000+02:00')
@@ -34,6 +36,7 @@ test('Generates a cron starting from now', t => {
     millisecond: 0,
   })
 
+  myCron.next()
   t.is(myCron.next().value.toISO(), now.toISO())
   t.is(myCron.next().value.toISO(), now.plus({ days: 1 }).toISO())
 })
@@ -41,6 +44,7 @@ test('Generates a cron starting from now', t => {
 test('Error handling with several cron pattern', t => {
   // only month - valid
   let myCron = generateCron('7', DateTime.fromISO('2018-06-28T12:00:00'))
+  myCron.next()
   t.is(myCron.next().value.toISO(), '2018-07-01T00:00:00.000+02:00')
   t.is(myCron.next().value.toISO(), '2018-07-01T00:01:00.000+02:00')
 
