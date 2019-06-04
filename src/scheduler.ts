@@ -92,6 +92,8 @@ export class Scheduler {
     }).pipe(
       expand(current => {
         const next = aSchedule.next().value
+
+        next.target = DateTime.max(next.target, current.target)
         const waitMs = next.target.valueOf() - current.target.valueOf()
         debug(
           `Croning from ${current.target.toISO()} to ${next.target.toISO()} = ${waitMs -

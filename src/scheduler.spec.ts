@@ -340,13 +340,14 @@ test('Real scheduling with past events', t => {
   testScheduler.run(({ cold, expectObservable }) => {
     const output = scheduler.schedule('10:00', '11:00').pipe(
       map(event => `${event.target.toISO()}-${event.index}`),
-      take(3)
+      take(4)
     )
 
-    expectObservable(output).toBe('a 3599999ms b 82799999ms (c|)', {
-      a: '2018-05-28T10:00:00.000+02:00-0',
-      b: '2018-05-28T11:00:00.000+02:00-1',
+    expectObservable(output).toBe('(a b) 79199996ms c  3599999ms (d|)', {
+      a: '2018-05-28T12:00:00.000+02:00-0',
+      b: '2018-05-28T12:00:00.000+02:00-1',
       c: '2018-05-29T10:00:00.000+02:00-0',
+      d: '2018-05-29T11:00:00.000+02:00-1',
     })
   })
 })
