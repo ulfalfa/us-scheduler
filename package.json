@@ -1,6 +1,6 @@
 {
   "name": "us-scheduler",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Universal scheduler with observables",
   "main": "dist/index",
   "author": "ulfalfa",

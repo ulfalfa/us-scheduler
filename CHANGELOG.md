@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.0.1"></a>
+## [3.0.1](https://github.com/ulfalfa/us-scheduler/compare/v3.0.0...v3.0.1) (2019-06-04)
+
+
+### Bug Fixes
+
+* **scheduler:** when scheduling with past events the timing got wrong (the first past event was emit ([5d09a31](https://github.com/ulfalfa/us-scheduler/commit/5d09a31))
+
+
+
 <a name="3.0.0"></a>
 # [3.0.0](https://github.com/ulfalfa/us-scheduler/compare/v2.2.0...v3.0.0) (2019-06-03)
 
