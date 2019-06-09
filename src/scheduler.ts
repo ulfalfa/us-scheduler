@@ -53,8 +53,9 @@ export class Scheduler {
     while (true) {
       let lastTarget = st.now.minus({ seconds: 1 })
 
-      for (let index = 0; index < times.length; index++) {
-        const target = st.parse(times[index])
+      // tslint:disable-next-line
+      for (const [index, time] of times.entries()) {
+        const target = st.parse(time)
 
         if (target.target <= lastTarget) {
           target.target = target.target.plus({ days: 1 })
@@ -94,7 +95,9 @@ export class Scheduler {
         const next = aSchedule.next().value
 
         next.target = DateTime.max(next.target, current.target)
-        const waitMs = next.target.valueOf() - current.target.valueOf()
+        const waitMs = Math.round(
+          next.target.valueOf() - current.target.valueOf()
+        )
         debug(
           `Croning from ${current.target.toISO()} to ${next.target.toISO()} = ${waitMs -
             1} ms`

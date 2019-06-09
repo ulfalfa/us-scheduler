@@ -5,6 +5,9 @@
 */
 
 // shortcuts for easier to read formulas
+import Debug from 'debug'
+import { DateTime } from 'luxon'
+const debug = Debug('us-scheduler:suncalc')
 
 const PI = Math.PI
 const sin = Math.sin
@@ -18,18 +21,19 @@ const rad = PI / 180
 // sun calculations are based on http://aa.quae.nl/en/reken/zonpositie.html formulas
 
 // date/time constants and conversions
+export type JulianDays = number
+const dayInMs = 86400000 // 1000 * 60 * 60 * 24
+const OFFSET = 7200000
+const J1970: JulianDays = 2440587.5
+const J2000: JulianDays = 2451545
 
-const dayMs = 1000 * 60 * 60 * 24
-const J1970 = 2440588
-const J2000 = 2451545
-
-function toJulian(date: Date): number {
-  return date.valueOf() / dayMs - 0.5 + J1970
+export function toJulian(date: DateTime): JulianDays {
+  return date.valueOf() / dayInMs + J1970
 }
-function fromJulian(j: number): Date {
-  return new Date((j + 0.5 - J1970) * dayMs)
+export function fromJulian(j: JulianDays): DateTime {
+  return DateTime.fromMillis((j - J1970) * dayInMs)
 }
-function toDays(date: Date): number {
+export function toDays(date: DateTime): JulianDays {
   return toJulian(date) - J2000
 }
 
@@ -73,11 +77,11 @@ function astroRefraction(h) {
 
 // general sun calculations
 
-function solarMeanAnomaly(d) {
+function solarMeanAnomaly(d: JulianDays): number {
   return rad * (357.5291 + 0.98560028 * d)
 }
 
-function eclipticLongitude(M) {
+function eclipticLongitude(M: number): number {
   const C = rad * (1.9148 * sin(M) + 0.02 * sin(2 * M) + 0.0003 * sin(3 * M)) // equation of center
   const P = rad * 102.9372 // perihelion of the Earth
 
@@ -85,7 +89,7 @@ function eclipticLongitude(M) {
 }
 
 function sunCoords(
-  days: number
+  days: JulianDays
 ): { declination: number; rightAscension: number } {
   const M = solarMeanAnomaly(days)
   const L = eclipticLongitude(M)
@@ -98,8 +102,8 @@ function sunCoords(
 
 // calculates sun position for a given date and latitude/longitude
 
-function getPosition(
-  date: Date,
+export function getPosition(
+  date: DateTime,
   lat: number,
   lng: number
 ): { azimuth: number; altitude: number } {
@@ -114,12 +118,6 @@ function getPosition(
     altitude: altitude(H, phi, c.declination),
   }
 }
-
-// sun times configuration (angle, morning name, evening name)
-
-// adds a custom time to the times config
-
-// calculations for sun times
 
 const J0 = 0.0009
 
@@ -147,19 +145,24 @@ function getSetJ(h, lw, phi, dec, n, M, L) {
 
 // calculates sun times for a given date and latitude/longitude
 
-export function getTimes(date, lat, lng) {
-  const lw = rad * -lng
-  const phi = rad * lat
-  const d = toDays(date)
-  const n = julianCycle(d, lw)
-  const ds = approxTransit(0, lw, n)
+export function getTimes(
+  day: DateTime,
+  lat: number,
+  lng: number
+): { [event: string]: DateTime } {
+  const date = day.set({ hour: 12 })
+
+  const radLng = rad * -lng
+  const radLat = rad * lat
+  const jd = toDays(date)
+  const n = julianCycle(jd, radLng)
+  const ds = approxTransit(0, radLng, n)
   const M = solarMeanAnomaly(ds)
   const L = eclipticLongitude(M)
   const dec = declination(L, 0)
   const jNoon = solarTransitJ(ds, M, L)
-  let i
-  let len
-  let time
+
+  debug('Days from Julian J2000', jd)
   let jSet
   let jRise
 
@@ -177,15 +180,25 @@ export function getTimes(date, lat, lng) {
     [6, 'goldenHourEnd', 'goldenHour'],
   ]
 
-  for (i = 0, len = times.length; i < len; i += 1) {
-    time = times[i]
+  const times2 = [
+    [-18, 'night'],
+    [-12, 'astronomicalDusk'],
+    [-6, 'nauticalDusk'],
+    [-0.833, 'civilDusk'],
+    [-0.3, 'day'],
+    [6, 'goldenHour'],
+  ]
 
-    jSet = getSetJ(time[0] * rad, lw, phi, dec, n, M, L)
-    jRise = jNoon - (jSet - jNoon)
+  debug('JNoon', jNoon)
+  times.forEach((time: [number, string, string]) => {
+    jSet = getSetJ(time[0] * rad, radLng, radLat, dec, n, M, L)
+    debug(`Time ${time[1]}-${time[2]}: ${jSet - jNoon}`)
+
+    jRise = jNoon - jSet + jNoon
 
     result[time[1]] = fromJulian(jRise)
     result[time[2]] = fromJulian(jSet)
-  }
+  })
 
   return result
 }

@@ -308,6 +308,7 @@ test('Real scheduling', t => {
     skipPast: true,
   })
   const testScheduler = new TestScheduler((actual, expected) => {
+    t.log(actual)
     t.deepEqual(actual, expected)
   })
 

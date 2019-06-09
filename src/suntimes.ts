@@ -1,4 +1,4 @@
-import * as Suncalc from 'suncalc'
+import { getTimes, getPosition } from './suncalc'
 
 import { DateTime, Duration } from 'luxon'
 import {
@@ -80,8 +80,8 @@ export class SunTimes {
   }
 
   calcSun(date: DateTime = DateTime.local()): SunPosition {
-    const result = Suncalc.getPosition(
-      date.toJSDate(),
+    const result = getPosition(
+      date,
       this.options.latitude,
       this.options.longitude
     )
@@ -94,20 +94,15 @@ export class SunTimes {
   }
 
   calcTimes(startTime: DateTime = DateTime.local()): Times {
-    const sctimes = Suncalc.getTimes(
-      startTime
-        .startOf('day')
-        .toUTC(2, { keepLocalTime: true })
-        .toJSDate(),
+    const sctimes = getTimes(
+      startTime,
       this.options.latitude,
       this.options.longitude
     )
     const resTimes: Times = Object.keys(sctimes).reduce(
       (times, cur) => {
-        if (!isNaN(sctimes[cur])) {
-          times[cur] = DateTime.fromJSDate(sctimes[cur]).setZone('local', {
-            keepCalendarTime: true,
-          })
+        if (sctimes[cur].isValid) {
+          times[cur] = sctimes[cur]
         }
 
         return times

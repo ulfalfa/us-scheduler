@@ -3,8 +3,7 @@ import anyTest, { TestInterface } from 'ava'
 import { SunTimes } from './suntimes'
 
 import { DateTime } from 'luxon'
-
-import * as SunCalc from 'suncalc'
+import { getPosition } from './suncalc'
 import { TestScheduler } from 'rxjs/testing'
 
 interface Context {
@@ -38,7 +37,7 @@ test('Construct for now', t => {
 
 test('Calc times', t => {
   const calcTimes = t.context.st.calcTimes(
-    DateTime.fromISO('2019-06-03T12:30:00.000+02:00')
+    DateTime.fromISO('2019-06-07T12:30:00.000+02:00')
   )
 
   const times = Object.keys(calcTimes).map(time => {
@@ -47,19 +46,20 @@ test('Calc times', t => {
   t.log(times)
 
   t.deepEqual(times, [
-    'midnight:2019-06-03T00:00:00.000+02:00',
-    'solarNoon:2019-06-03T13:19:37.214+02:00',
-    'nadir:2019-06-03T01:19:37.214+02:00',
-    'sunrise:2019-06-03T04:57:38.837+02:00',
-    'sunset:2019-06-03T21:41:35.592+02:00',
-    'sunriseEnd:2019-06-03T05:02:22.448+02:00',
-    'sunsetStart:2019-06-03T21:36:51.981+02:00',
-    'dawn:2019-06-03T04:07:14.640+02:00',
-    'dusk:2019-06-03T22:31:59.789+02:00',
-    'nauticalDawn:2019-06-03T02:44:28.748+02:00',
-    'nauticalDusk:2019-06-03T23:54:45.680+02:00',
-    'goldenHourEnd:2019-06-03T05:54:12.679+02:00',
-    'goldenHour:2019-06-03T20:45:01.749+02:00',
+    'midnight:2019-06-07T00:00:00.000+02:00',
+    'solarNoon:2019-06-07T13:20:17.668+02:00',
+    'nadir:2019-06-07T01:20:17.668+02:00',
+    'sunrise:2019-06-07T04:54:46.966+02:00',
+    'sunset:2019-06-07T21:45:48.370+02:00',
+    'sunriseEnd:2019-06-07T04:59:34.601+02:00',
+    'sunsetStart:2019-06-07T21:41:00.736+02:00',
+    'dawn:2019-06-07T04:03:23.763+02:00',
+    'dusk:2019-06-07T22:37:11.574+02:00',
+
+    'nauticalDawn:2019-06-07T02:36:02.604+02:00',
+    'nauticalDusk:2019-06-08T00:04:32.733+02:00',
+    'goldenHourEnd:2019-06-07T05:51:58.495+02:00',
+    'goldenHour:2019-06-07T20:48:36.842+02:00',
   ])
 
   t.deepEqual(
@@ -264,8 +264,7 @@ test('Get sunposition', t => {
   const pos = st.sun
   t.is(
     pos.altitude,
-    SunCalc.getPosition(pos.date.toJSDate(), 53.54, 9.98).altitude *
-      (90 / Math.PI)
+    getPosition(pos.date, 53.54, 9.98).altitude * (90 / Math.PI)
   )
 })
 
